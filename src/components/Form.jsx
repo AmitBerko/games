@@ -14,35 +14,23 @@ function SubForm({ isLogin }) {
 			<div className="form-padding">
 				<div className="form-content">
 					<div className="input-box">
-						<input
-							tabIndex={isLogin ? '' : -1}
-							placeholder=""
-							id={`email-input${isLogin ? '1' : '2'}`}
-						></input>
+						<input placeholder="" id={`email-input${isLogin ? '1' : '2'}`}></input>
 						<label htmlFor={`email-input${isLogin ? '1' : '2'}`}>Email</label>
 						<i className="fa-solid fa-envelope"></i>
 					</div>
 					<div className="input-box">
-						<input
-							tabIndex={isLogin ? '' : -1}
-							placeholder=""
-							id={`password-input${isLogin ? '1' : '2'}`}
-						></input>
+						<input placeholder="" id={`password-input${isLogin ? '1' : '2'}`}></input>
 						<label htmlFor={`password-input${isLogin ? '1' : '2'}`}>Password</label>
 						<i className="fa-solid fa-lock"></i>
 					</div>
 					{!isLogin && (
 						<div className="input-box">
-							<input
-								tabIndex={isLogin ? '' : -1}
-								placeholder=""
-								id="confirm-password-input"
-							></input>
+							<input placeholder="" id="confirm-password-input"></input>
 							<label htmlFor="confirm-password-input">Confirm Password</label>
 							<i className="fa-solid fa-lock"></i>
 						</div>
 					)}
-					<button tabIndex={isLogin ? '' : -1}>{isLogin ? 'Login' : 'Register'}</button>
+					<button>{isLogin ? 'Login' : 'Register'}</button>
 					<p className="login-register">
 						{isLogin ? `Don't have an account?` : 'Already have an account?'}{' '}
 						<label for="check">
