@@ -197,31 +197,57 @@ body {
 }
 
 .speed-game-wrapper {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr 3.5fr 1fr;
+	grid-column-gap: 0px;
+	grid-row-gap: 0px;
+	height: 100vh;
+}
+
+.speed-game-timer-score {
+	grid-row: 1 / 1;
+	grid-column: 1 / 2;
+	display: flex;
+	align-self: end;
+	justify-content: center;
+}
+
+.speed-game-timer {
+	padding-right: 2.25rem;
+	border-right: 1px solid grey;
+}
+
+.speed-game-score {
+	padding-left: 2.25rem;
+	border-left: 1px solid grey;
 }
 
 .tiles-container {
 	position: relative;
 	display: grid;
-	grid-template-columns: repeat(4, 125px);
-	grid-template-rows: repeat(4, 125px);
-	overflow: hidden !important;
+	/* width: clamp(250px, 50%, 80%); */
+	grid-template-columns: repeat(4, 1fr);
+	grid-template-rows: repeat(4, 1fr);
+	width: min(80%, 500px);
+	aspect-ratio: 1;
+	overflow: hidden;
+	grid-row: 2 / 3;
+	grid-column: 1 / 2;
+	place-self: center;
 }
 
 .wave {
 	position: absolute;
-  left: var(--wave-x);
-  top: var(--wave-y);
+	left: var(--wave-x);
+	top: var(--wave-y);
 	transform: translate(-50%, -50%);
-  border: solid 2px rgba(128, 128, 128, 0.6);
+	border: solid 2px rgba(128, 128, 128, 0.6);
 	content: '';
-  z-index: -1;
+	z-index: -1;
 	border-radius: 50%;
-  animation: mouse-wave 0.4s forwards;
-  pointer-events: none;
+	animation: mouse-wave 0.4s forwards;
+	pointer-events: none;
 }
 
 @keyframes mouse-wave {
@@ -233,7 +259,7 @@ body {
 	100% {
 		width: 5rem;
 		height: 5rem;
-    opacity: 0.2;
+		opacity: 0.2;
 	}
 }
 
@@ -255,25 +281,13 @@ body {
 } */
 
 .tile {
-	/* border-radius: 1rem; */
 	border: grey 1px solid;
 	cursor: pointer;
 	user-select: none;
 }
-/* 
-.tile::before {
-  
-} */
 
 .tile.active {
-	background: rgb(245, 158, 11);
-	background: radial-gradient(
-		/* 50px circle at var(--tile-gradient-x) var(--tile-gradient-y), */ 50px circle at 50% 50%,
-
-		rgba(245, 158, 11, 1) 0%,
-		rgba(245, 158, 11, 1) 20%,
-		rgba(249, 115, 22, 1) 100%
-	);
+	background-image: linear-gradient(135deg, #22c55e 10%, #16a34a 100%);
 }
 
 /* .tile:not(.active):hover {
