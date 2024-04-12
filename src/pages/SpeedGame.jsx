@@ -1,15 +1,38 @@
 import React, { useState, useEffect } from 'react'
 import Tile from '../components/Tile'
 import SpeedGameResults from '../components/SpeedGameResults'
+import { useAuth } from '../components/AuthProvider'
 
 function SpeedGame() {
 	const tileCount = 16
-	const getRandomIndex = () => {
-		return Math.floor(Math.random() * tileCount)
+	const gameTime = 15000
+  const [user, setUser] = useAuth()
+
+	const getRandomIndexes = (clickedTile, prevIndexes) => {
+
+		// Generates a random index instead of the one that was click
+		const indexToReplace = prevIndexes.indexOf(clickedTile)
+		const otherIndex = prevIndexes[indexToReplace === 0 ? 1 : 0]
+		let newIndex
+		do {
+			newIndex = Math.floor(Math.random() * tileCount)
+		} while (newIndex === clickedTile || newIndex === otherIndex)
+
+		return [newIndex, otherIndex]
 	}
 
-	const gameTime = 5000
-	const [activeIndex, setActiveIndex] = useState(getRandomIndex())
+  const getInitialIndexes = () => {
+    const firstIndex = Math.floor(Math.random() * tileCount)
+    let secondIndex
+    do {
+      secondIndex = Math.floor(Math.random() * tileCount)
+    }
+    while (firstIndex === secondIndex)
+
+    return [firstIndex, secondIndex]
+  }
+
+	const [activeIndexes, setActiveIndexes] = useState(getInitialIndexes())
 	const [timer, setTimer] = useState(gameTime) // start with 20 seconds
 	const [readyToStart, setReadyToStart] = useState(false)
 	const [hasStarted, setHasStarted] = useState(false)
@@ -23,15 +46,9 @@ function SpeedGame() {
 		if (score === 0 && readyToStart) {
 			setHasStarted(true)
 		}
-
 		setScore((prevScore) => prevScore + 1)
-		setActiveIndex((prevIndex) => {
-			let newIndex = getRandomIndex()
-			while (newIndex === prevIndex) {
-				newIndex = getRandomIndex()
-			}
-			return newIndex
-		})
+    const clickedTile = parseInt(e.target.id.slice(4))
+		setActiveIndexes((prevIndexes) => getRandomIndexes(clickedTile, prevIndexes))
 	}
 
 	useEffect(() => {
@@ -67,8 +84,8 @@ function SpeedGame() {
 					if (prevTimer > 0) {
 						return prevTimer - 10
 					} else {
-            // GAME FINISHED
-            setResultsModalInfo({show: true, score: score})
+						// GAME FINISHED
+						setResultsModalInfo({ show: true, score: score })
 						// setShowResults(true)
 						setReadyToStart(false)
 						setHasStarted(false)
@@ -97,6 +114,7 @@ function SpeedGame() {
 
 	return (
 		<>
+    user is {user.name}
 			<div className="speed-game-wrapper">
 				<div className="speed-game-timer-score display-1 fw-medium">
 					<div className="speed-game-timer">{timer}</div>
@@ -108,7 +126,7 @@ function SpeedGame() {
 							handleActiveClick={handleActiveClick}
 							key={`tile${index}`}
 							id={`tile${index}`}
-							isActive={index === activeIndex}
+							isActive={activeIndexes.includes(index)}
 						/>
 					))}
 				</div>
@@ -117,8 +135,8 @@ function SpeedGame() {
 			<button onClick={() => setReadyToStart(false)}>stop</button>
 			<SpeedGameResults
 				setReadyToStart={setReadyToStart}
-        resultsModalInfo={resultsModalInfo}
-        setResultsModalInfo={setResultsModalInfo}
+				resultsModalInfo={resultsModalInfo}
+				setResultsModalInfo={setResultsModalInfo}
 			/>
 			{`ready: ${readyToStart} hasstarted: ${hasStarted}`}
 		</>
