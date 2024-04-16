@@ -130,7 +130,7 @@ body {
 }
 
 .input-box:last-of-type input {
-	margin-bottom: 3.5rem;
+	margin-bottom: 2.5rem;
 }
 
 .input-box input:focus ~ label,
@@ -163,9 +163,14 @@ body {
 	border: none;
 	border-radius: 0.85rem;
 	font-size: 1.2rem;
+  height: 2.4rem;
 	padding: 0.45rem 0;
 	cursor: pointer;
 	margin-bottom: 1.5rem;
+}
+
+.form-container button:disabled {
+  cursor: default;
 }
 
 .form-container.register-form button {
@@ -194,6 +199,18 @@ body {
 
 .form-container.login-form .login-register > label > span {
 	color: var(--form2-color);
+}
+
+.form-spinner {
+  font-size: 1.5rem;
+  width: calc(0.9rem + 12px);
+  height: calc(0.9rem + 12px);
+}
+
+.form-alert {
+  background-color: #9c2b2e;
+  border-color: rgb(118, 31, 38);
+  color: var(--text-color);
 }
 
 .speed-game-wrapper {

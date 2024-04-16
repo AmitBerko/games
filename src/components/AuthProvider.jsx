@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { auth } from '../firebase'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 
 const AuthContext = createContext()
 
@@ -22,10 +22,14 @@ export default function AuthProvider({ children }) {
 	}
 
 	async function login(email, password) {
-		// return createUserWithEmailAndPassword(email, password)
+		return await signInWithEmailAndPassword(auth, email, password)
 	}
 
-	return <AuthContext.Provider value={{ user, signup, login }}>{!isLoading && children}</AuthContext.Provider>
+  async function signOut() {
+    return await auth.signOut()
+  }
+
+	return <AuthContext.Provider value={{ user, signup, login, signOut }}>{!isLoading && children}</AuthContext.Provider>
 }
 
 export const useAuth = () => useContext(AuthContext)

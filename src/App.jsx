@@ -10,9 +10,7 @@ const router = createBrowserRouter([
 	{
 		path: '/',
 		element: (
-			<ProtectedRoute>
-				<Homepage />
-			</ProtectedRoute>
+			<ProtectedRoute component={Homepage} />
 		),
 	},
 	{
@@ -22,10 +20,8 @@ const router = createBrowserRouter([
 ])
 
 function App() {
-	let currentUser = {name: 'amit', id: 1} // replace it with firebase authentication later
-
 	return (
-		<AuthProvider currentUser={currentUser}>
+		<AuthProvider>
 			<RouterProvider router={router} />
 		</AuthProvider>
 	)
