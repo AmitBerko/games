@@ -163,14 +163,14 @@ body {
 	border: none;
 	border-radius: 0.85rem;
 	font-size: 1.2rem;
-  height: 2.4rem;
+	height: 2.4rem;
 	padding: 0.45rem 0;
 	cursor: pointer;
 	margin-bottom: 1.5rem;
 }
 
 .form-container button:disabled {
-  cursor: default;
+	cursor: default;
 }
 
 .form-container.register-form button {
@@ -202,15 +202,15 @@ body {
 }
 
 .form-spinner {
-  font-size: 1.5rem;
-  width: calc(0.9rem + 12px);
-  height: calc(0.9rem + 12px);
+	font-size: 1.5rem;
+	width: calc(0.9rem + 12px);
+	height: calc(0.9rem + 12px);
 }
 
 .form-alert {
-  background-color: #9c2b2e;
-  border-color: rgb(118, 31, 38);
-  color: var(--text-color);
+	background-color: #9c2b2e;
+	border-color: rgb(118, 31, 38);
+	color: var(--text-color);
 }
 
 .speed-game-wrapper {
@@ -262,6 +262,11 @@ body {
 
 .tile.active {
 	background-image: linear-gradient(135deg, #22c55e 10%, #16a34a 100%);
+	transition: opacity 0.3s linear; /* Transition opacity */
+}
+
+.tile:not(.active) {
+	opacity: 1; /* Keep non-active tiles fully opaque */
 }
 
 .wave {
@@ -354,6 +359,16 @@ body {
 	animation-delay: 5.5s;
 }
 
+.homepage .user-greeting {
+	position: absolute;
+	top: 1rem;
+	left: 1rem;
+}
+
+.user-greeting button {
+	margin-left: 0.5rem;
+}
+
 .games-menu-container {
 	display: flex;
 	background-color: rgb(45, 45, 45);
@@ -415,6 +430,60 @@ body {
 .games-menu-btn:active {
 	/* might remove this */
 	transform: scale(0.9);
+}
+
+.memory-game-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+  border: 2px solid red;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.memory-grid-container {
+	display: grid;
+	grid-template-columns: repeat(
+		var(--memory-grid-length),
+		min(calc(85vw / var(--memory-grid-length)), 100px)
+	);
+	grid-template-rows: repeat(
+		var(--memory-grid-length),
+		min(calc(85vw / var(--memory-grid-length)), 100px)
+	);
+	gap: 0.5rem;
+}
+
+.level-tries {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+}
+
+.level-tries .level {
+  margin: 0;
+}
+
+.level-tries .tries {
+  margin: 0;
+}
+
+.memory-tile {
+	background-color: rgb(150, 150, 150);
+	cursor: pointer;
+}
+
+.memory-tile.correct-tile {
+  background-color: lightskyblue;
+}
+
+.memory-tile.wrong-tile {
+  background-color: red;
 }
 
 @keyframes floating-bubble {

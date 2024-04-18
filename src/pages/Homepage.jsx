@@ -1,15 +1,21 @@
 import React from 'react'
 import { useAuth } from '../components/AuthProvider'
+import { useNavigate } from 'react-router-dom'
 
 function Homepage() {
-	const { user, setUser } = useAuth()
+	const { user, signOut } = useAuth()
+  const navigate = useNavigate()
 
-	if (!user) {
-		return null
+	async function handleSignOut() {
+		await signOut()
 	}
 
 	return (
 		<div className="homepage">
+			<div className="user-greeting">
+				Hello {user.email.slice(0, user.email.indexOf('@'))}
+				<button onClick={handleSignOut}>LOG OUT</button>
+			</div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
@@ -18,14 +24,13 @@ function Homepage() {
 			<div className="bubble"></div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
-
 			<div className="games-menu-container container">
 				<div className="games-menu-title display-3 fw-bold">Games Menu</div>
 				<div className="games-menu-content">
-					<button className="games-menu-btn fs-1">
+					<button onClick={() => navigate('/speed-game')} className="games-menu-btn fs-1">
 						<span>Speed Game</span>
 					</button>
-					<button className="games-menu-btn fs-1">
+					<button onClick={() => navigate('/memory-game')} className="games-menu-btn fs-1">
 						<span>Memory Game</span>
 					</button>
 					<button className="games-menu-btn fs-1">

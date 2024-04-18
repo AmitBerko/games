@@ -3,19 +3,27 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import AuthProvider from './components/AuthProvider'
 import Homepage from './pages/Homepage'
 import ProtectedRoute from './components/ProtectedRoute'
+import SpeedGame from './pages/SpeedGame'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './assets/styles.css'
+import MemoryGame from './pages/MemoryGame'
 
 const router = createBrowserRouter([
 	{
 		path: '/',
-		element: (
-			<ProtectedRoute component={Homepage} />
-		),
+		element: <ProtectedRoute component={Homepage} />,
 	},
 	{
 		path: '/login',
 		element: <Form />,
+	},
+	{
+		path: '/speed-game',
+		element: <ProtectedRoute component={SpeedGame} />,
+	},
+	{
+		path: '/memory-game',
+		element: <ProtectedRoute component={MemoryGame} />,
 	},
 ])
 
