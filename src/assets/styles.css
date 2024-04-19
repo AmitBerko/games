@@ -437,53 +437,92 @@ body {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-  border: 2px solid red;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
 }
 
 .memory-grid-container {
 	display: grid;
-	grid-template-columns: repeat(
+	place-content: center;
+  width: calc(150px * var(--memory-grid-length));
+  max-width: min(92.5vw, 60vh);
+	aspect-ratio: 1;
+	grid-template-columns: repeat(var(--memory-grid-length), 1fr);
+	grid-template-rows: repeat(var(--memory-grid-length), 1fr);
+
+	gap: var(--memory-grid-gap);
+
+	/* grid-template-columns: repeat(
 		var(--memory-grid-length),
-		min(calc(85vw / var(--memory-grid-length)), 100px)
-	);
-	grid-template-rows: repeat(
+		min(
+			calc(
+				(92.5vw - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
+					var(--memory-grid-length)
+			),
+			min(
+				110px,
+				calc(
+					(65vh - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
+						var(--memory-grid-length)
+				)
+			)
+		)
+	); */
+	/* grid-template-rows: repeat(
 		var(--memory-grid-length),
-		min(calc(85vw / var(--memory-grid-length)), 100px)
-	);
-	gap: 0.5rem;
+		min(
+			calc(
+				(92.5vw - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
+					var(--memory-grid-length)
+			),
+			min(
+				110px,
+				calc(
+					(65vh - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
+						var(--memory-grid-length)
+				)
+			)
+		)
+	); */
 }
 
 .level-tries {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  width: 100%;
+	display: flex;
+
+	/* space-around also looks good. check whats better */
+	justify-content: space-around;
+	align-items: center;
+	width: 100%;
 }
 
 .level-tries .level {
-  margin: 0;
+	margin: 0;
 }
 
 .level-tries .tries {
-  margin: 0;
+	margin: 0;
 }
 
 .memory-tile {
 	background-color: rgb(150, 150, 150);
 	cursor: pointer;
+	border-radius: 0.4rem;
+  /* max-width: 100px; */
+  aspect-ratio: 1;
 }
 
 .memory-tile.correct-tile {
-  background-color: lightskyblue;
+	background-color: lightskyblue;
+	cursor: default;
 }
 
 .memory-tile.wrong-tile {
-  background-color: red;
+	/* background-color: rgb(, , ); */
+	opacity: 0.2;
+	cursor: default;
 }
 
 @keyframes floating-bubble {
