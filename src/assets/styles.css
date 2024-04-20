@@ -491,11 +491,32 @@ body {
 
 .correct-tile.animate-flip {
 	animation: flip-tile 0.2s linear, change-color 0s 0.1s linear;
-  animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
 }
 
 .memory-tile.animate-unflip {
 	animation: revert-flip-tile 0.2s linear, revert-change-color 0s 0.1s linear;
+}
+
+.level-pass {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgb(95, 95, 95);
+	z-index: -1;
+	opacity: 0;
+}
+
+.level-pass.animate {
+	animation: level-pass 0.15s forwards alternate 2;
+}
+
+@keyframes level-pass {
+	to {
+		opacity: 0.25;
+	}
 }
 
 @keyframes flip-tile {

@@ -138,6 +138,8 @@ function MemoryGame() {
 		if (correctIndexesCount === correctIndexes.length && correctIndexes.length > 0) {
 			setDisableTiles(true)
 			// Maybe add an animation on the background for passing the level
+      const levelPass = document.querySelector('.level-pass')
+      levelPass.classList.add('animate')
 
 			setTimeout(() => {
 				// 1 second after passing the level, remove all correct and wrong tiles classes
@@ -151,6 +153,7 @@ function MemoryGame() {
 
 						setTimeout(() => {
 							tile.classList.remove('animate-unflip')
+              levelPass.classList.remove('animate')
 						}, 300)
 					}
 				})
@@ -200,6 +203,7 @@ function MemoryGame() {
 				</div>
 				<div></div>
 			</div>
+      <div className="level-pass"></div>
 		</>
 	)
 }
