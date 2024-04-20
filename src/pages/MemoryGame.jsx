@@ -59,13 +59,18 @@ function MemoryGame() {
 	}, [gridLength])
 
 	useEffect(() => {
-		setGridLength(() => {
-			const { gridLength, correctRatio } =
-      // Use the current level's config. If it doesnt exist in the config, use the last one
-				levelConfig[level] || levelConfig[Object.keys(levelConfig).length]
-			setCorrectIndexes(getRandomIndexes(gridLength, correctRatio))
-			return gridLength
-		})
+		// If its level 1, have a 1 second delay, otherwise start immediately
+		const delay = level === 1 ? 1000 : 0
+		setTimeout(() => {
+			setCorrectIndexesCount(0)
+			setGridLength(() => {
+				const { gridLength, correctRatio } =
+					// Use the current level's config. If it doesnt exist in the config, use the last one
+					levelConfig[level] || levelConfig[Object.keys(levelConfig).length]
+				setCorrectIndexes(getRandomIndexes(gridLength, correctRatio))
+				return gridLength
+			})
+		}, delay)
 	}, [level])
 
 	useEffect(() => {
@@ -95,11 +100,19 @@ function MemoryGame() {
 	useEffect(() => {
 		const correctTiles = [...document.querySelectorAll('.correct-tile')]
 		if (correctTiles.length === 0) return
+		correctTiles.map((tile) => {
+			tile.classList.add('animate-flip')
+		})
 
 		setTimeout(() => {
 			correctTiles.map((tile) => {
-				tile.classList.remove('correct-tile')
+				tile.classList.add('animate-unflip')
+				tile.classList.remove('correct-tile', 'animate-flip')
 				setDisableTiles(false)
+
+				setTimeout(() => {
+					tile.classList.remove('animate-unflip')
+				}, 300)
 			})
 		}, 2000)
 	}, [correctIndexes])
@@ -111,6 +124,7 @@ function MemoryGame() {
 		if (correctIndexes.includes(tileIndex)) {
 			// If correct
 			tile.classList.add('correct-tile')
+			tile.classList.add('animate-flip')
 			setCorrectIndexesCount((prevLength) => prevLength + 1)
 		} else {
 			// If wrong
@@ -120,43 +134,73 @@ function MemoryGame() {
 	}
 
 	useEffect(() => {
+		// Means we passed the level
 		if (correctIndexesCount === correctIndexes.length && correctIndexes.length > 0) {
-			// get to the next level
-			const wrongTiles = [...document.getElementsByClassName('wrong-tile')]
-			// if (wrongTiles.length === 0) {
-			//   console.log('wrong were 0')
-			//   return
-			// }
+			setDisableTiles(true)
+			// Maybe add an animation on the background for passing the level
 
-			wrongTiles.map((tile) => {
-				tile?.classList.remove('wrong-tile')
-			})
-			setCorrectIndexesCount(0)
-			setLevel((prevLevel) => prevLevel + 1)
+			setTimeout(() => {
+				// 1 second after passing the level, remove all correct and wrong tiles classes
+				const tiles = [...document.querySelectorAll('.memory-tile')]
+				tiles.map((tile) => {
+					if (tile.classList.contains('wrong-tile')) {
+						tile.classList.remove('wrong-tile')
+					} else if (tile.classList.contains('correct-tile')) {
+						tile.classList.remove('correct-tile', 'animate-flip')
+						tile.classList.add('animate-unflip')
+
+						setTimeout(() => {
+							tile.classList.remove('animate-unflip')
+						}, 300)
+					}
+				})
+
+				setTimeout(() => {
+					// 1 second after removing all correct and wrong tiles, get to the next level
+					setCorrectIndexes([]) // Removes the correct-tile class from all tiles
+
+					setLevel((prevLevel) => prevLevel + 1)
+				}, 1000)
+			}, 1000)
 		}
 	}, [correctIndexesCount])
 
+	useEffect(() => {
+		const tiles = [...document.querySelectorAll('.memory-tile')]
+
+		if (disableTiles) {
+			tiles.map((tile) => {
+				tile.style.cursor = 'default'
+			})
+		} else {
+			tiles.map((tile) => {
+				tile.style.cursor = ''
+			})
+		}
+	}, [disableTiles])
+
 	return (
-		<div className="memory-game-container">
-			<div className="level-tries fs-1">
-				<p className="level">Level {level}</p>
-				<p className="tries">
-					{triesLeft}{' '}
-					<i className="fa-solid fa-heart" style={{ '--fa-animation-iteration-count': 1 }}></i>
-				</p>
+		<>
+			<div className="memory-game-container">
+				<div className="level-tries fs-1">
+					<p className="level">Level {level}</p>
+					<p className="tries">
+						{triesLeft}{' '}
+						<i className="fa-solid fa-heart" style={{ '--fa-animation-iteration-count': 1 }}></i>
+					</p>
+				</div>
+				<div className="memory-grid-container">
+					{Array.from({ length: gridLength * gridLength }).map((_, index) => (
+						<MemoryTile
+							key={`tile${index}`}
+							handleTileClick={() => handleTileClick(index)}
+							isCorrect={correctIndexes.includes(index)}
+						/>
+					))}
+				</div>
+				<div></div>
 			</div>
-			<div className="memory-grid-container">
-				{Array.from({ length: gridLength * gridLength }).map((_, index) => (
-					<MemoryTile
-						key={`tile${index}`}
-						handleTileClick={() => handleTileClick(index)}
-						isCorrect={correctIndexes.includes(index)}
-						disableTiles={disableTiles}
-					/>
-				))}
-			</div>
-			<div></div>
-		</div>
+		</>
 	)
 }
 

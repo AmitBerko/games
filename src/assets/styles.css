@@ -447,46 +447,12 @@ body {
 .memory-grid-container {
 	display: grid;
 	place-content: center;
-  width: calc(150px * var(--memory-grid-length));
-  max-width: min(92.5vw, 60vh);
+	width: calc(150px * var(--memory-grid-length));
+	max-width: min(92.5vw, 60vh);
 	aspect-ratio: 1;
 	grid-template-columns: repeat(var(--memory-grid-length), 1fr);
 	grid-template-rows: repeat(var(--memory-grid-length), 1fr);
-
 	gap: var(--memory-grid-gap);
-
-	/* grid-template-columns: repeat(
-		var(--memory-grid-length),
-		min(
-			calc(
-				(92.5vw - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
-					var(--memory-grid-length)
-			),
-			min(
-				110px,
-				calc(
-					(65vh - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
-						var(--memory-grid-length)
-				)
-			)
-		)
-	); */
-	/* grid-template-rows: repeat(
-		var(--memory-grid-length),
-		min(
-			calc(
-				(92.5vw - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
-					var(--memory-grid-length)
-			),
-			min(
-				110px,
-				calc(
-					(65vh - (var(--memory-grid-length) - 1) * var(--memory-grid-gap)) /
-						var(--memory-grid-length)
-				)
-			)
-		)
-	); */
 }
 
 .level-tries {
@@ -510,19 +476,66 @@ body {
 	background-color: rgb(150, 150, 150);
 	cursor: pointer;
 	border-radius: 0.4rem;
-  /* max-width: 100px; */
-  aspect-ratio: 1;
+	/* max-width: 100px; */
+	aspect-ratio: 1;
 }
 
 .memory-tile.correct-tile {
-	background-color: lightskyblue;
 	cursor: default;
 }
 
 .memory-tile.wrong-tile {
-	/* background-color: rgb(, , ); */
 	opacity: 0.2;
 	cursor: default;
+}
+
+.correct-tile.animate-flip {
+	animation: flip-tile 0.2s linear, change-color 0s 0.1s linear;
+  animation-fill-mode: forwards;
+}
+
+.memory-tile.animate-unflip {
+	animation: revert-flip-tile 0.2s linear, revert-change-color 0s 0.1s linear;
+}
+
+@keyframes flip-tile {
+	from {
+		transform: rotateX(0deg);
+	}
+
+	to {
+		transform: rotateX(180deg);
+	}
+}
+
+@keyframes change-color {
+	from {
+		background-color: initial;
+	}
+
+	to {
+		background-color: #87cefa;
+	}
+}
+
+@keyframes revert-flip-tile {
+	0% {
+		transform: rotateX(180deg);
+	}
+
+	100% {
+		transform: rotateX(0deg);
+	}
+}
+
+@keyframes revert-change-color {
+	0% {
+		background-color: #87cefa;
+	}
+
+	100% {
+		background-color: initial;
+	}
 }
 
 @keyframes floating-bubble {
