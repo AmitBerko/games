@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import MemoryTile from '../components/MemoryTile'
+import MemoryGameResults from '../components/MemoryGameResults'
+import { useNavigate } from 'react-router-dom'
 
 function MemoryGame() {
 	const [level, setLevel] = useState(1)
@@ -8,6 +10,24 @@ function MemoryGame() {
 	const [correctIndexes, setCorrectIndexes] = useState([])
 	const [disableTiles, setDisableTiles] = useState(true)
 	const [correctIndexesCount, setCorrectIndexesCount] = useState(0) // To prevent dom manipulation
+  const navigate = useNavigate()
+
+	// Results modal
+	const [showResults, setShowResults] = useState(false)
+
+	const handlePlayAgain = () => {
+		removeSpecialClasses()
+		setCorrectIndexes([])
+		setCorrectIndexesCount(0)
+		setTriesLeft(3)
+		setLevel(1)
+		setShowResults(false)
+	}
+
+  const handleReturn = () => {
+    setShowResults(false)
+    navigate('/')
+  }
 
 	const levelConfig = {
 		1: { gridLength: 3, correctRatio: 0.4 },
@@ -43,6 +63,25 @@ function MemoryGame() {
 		}
 
 		return indexes.slice(0, gridLength * gridLength * correctTilesRatio)
+	}
+
+	function removeSpecialClasses() {
+		const tiles = [...document.querySelectorAll('.memory-tile')]
+		const levelPass = document.querySelector('.level-pass')
+
+		tiles.map((tile) => {
+			if (tile.classList.contains('wrong-tile')) {
+				tile.classList.remove('wrong-tile')
+			} else if (tile.classList.contains('correct-tile')) {
+				tile.classList.remove('correct-tile', 'animate-flip')
+				tile.classList.add('animate-unflip')
+
+				setTimeout(() => {
+					tile.classList.remove('animate-unflip')
+					levelPass.classList.remove('animate')
+				}, 300)
+			}
+		})
 	}
 
 	useEffect(() => {
@@ -86,10 +125,10 @@ function MemoryGame() {
 
 		heartIcon.addEventListener('animationend', handleAnimationEnd)
 		if (triesLeft === 0) {
-			alert('you lost')
 			setDisableTiles(true)
 
 			// open up a results modal or something
+			setShowResults(true)
 		}
 
 		return () => {
@@ -138,25 +177,12 @@ function MemoryGame() {
 		if (correctIndexesCount === correctIndexes.length && correctIndexes.length > 0) {
 			setDisableTiles(true)
 			// Maybe add an animation on the background for passing the level
-      const levelPass = document.querySelector('.level-pass')
-      levelPass.classList.add('animate')
+			const levelPass = document.querySelector('.level-pass')
+			levelPass.classList.add('animate')
 
 			setTimeout(() => {
 				// 1 second after passing the level, remove all correct and wrong tiles classes
-				const tiles = [...document.querySelectorAll('.memory-tile')]
-				tiles.map((tile) => {
-					if (tile.classList.contains('wrong-tile')) {
-						tile.classList.remove('wrong-tile')
-					} else if (tile.classList.contains('correct-tile')) {
-						tile.classList.remove('correct-tile', 'animate-flip')
-						tile.classList.add('animate-unflip')
-
-						setTimeout(() => {
-							tile.classList.remove('animate-unflip')
-              levelPass.classList.remove('animate')
-						}, 300)
-					}
-				})
+				removeSpecialClasses()
 
 				setTimeout(() => {
 					// 1 second after removing all correct and wrong tiles, get to the next level
@@ -203,7 +229,12 @@ function MemoryGame() {
 				</div>
 				<div></div>
 			</div>
-      <div className="level-pass"></div>
+			<div className="level-pass"></div>
+			<MemoryGameResults
+				showResults={showResults}
+				handlePlayAgain={handlePlayAgain}
+				handleReturn={handleReturn}
+			/>
 		</>
 	)
 }
