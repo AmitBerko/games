@@ -16,14 +16,14 @@ function Homepage() {
 				Hello {user.email.slice(0, user.email.indexOf('@'))}
 				<button onClick={handleSignOut}>LOG OUT</button>
 			</div>
+			{/* <div className="bubble"></div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
 			<div className="bubble"></div>
-			<div className="bubble"></div>
-			<div className="bubble"></div>
+			<div className="bubble"></div> */}
 			<div className="games-menu-container container">
 				<div className="games-menu-title display-3 fw-bold">Games Menu</div>
 				<div className="games-menu-content">
