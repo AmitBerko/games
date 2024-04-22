@@ -447,8 +447,8 @@ body {
 .memory-grid-container {
 	display: grid;
 	place-content: center;
-	width: calc(150px * var(--memory-grid-length));
-	max-width: min(92.5vw, 60vh);
+	width: calc(125px * var(--memory-grid-length));
+	max-width: min(90vw, 60vh);
 	aspect-ratio: 1;
 	grid-template-columns: repeat(var(--memory-grid-length), 1fr);
 	grid-template-rows: repeat(var(--memory-grid-length), 1fr);
