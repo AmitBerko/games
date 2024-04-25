@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import MemoryTile from '../components/MemoryTile'
 import MemoryGameResults from '../components/MemoryGameResults'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../components/AuthProvider'
 
 function MemoryGame() {
 	const [level, setLevel] = useState(1)
@@ -11,11 +12,11 @@ function MemoryGame() {
 	const [disableTiles, setDisableTiles] = useState(true)
 	const [correctIndexesCount, setCorrectIndexesCount] = useState(0) // To prevent dom manipulation
   const navigate = useNavigate()
-
 	// Results modal
 	const [showResults, setShowResults] = useState(false)
 
 	const handlePlayAgain = () => {
+    // Bring all settings to default
 		removeSpecialClasses()
 		setCorrectIndexes([])
 		setCorrectIndexesCount(0)
@@ -103,8 +104,8 @@ function MemoryGame() {
 		setTimeout(() => {
 			setCorrectIndexesCount(0)
 			setGridLength(() => {
+        // Use the current level's config. If it doesnt exist in the config, use the last one
 				const { gridLength, correctRatio } =
-					// Use the current level's config. If it doesnt exist in the config, use the last one
 					levelConfig[level] || levelConfig[Object.keys(levelConfig).length]
 				setCorrectIndexes(getRandomIndexes(gridLength, correctRatio))
 				return gridLength
@@ -176,7 +177,6 @@ function MemoryGame() {
 		// Means we passed the level
 		if (correctIndexesCount === correctIndexes.length && correctIndexes.length > 0) {
 			setDisableTiles(true)
-			// Maybe add an animation on the background for passing the level
 			const levelPass = document.querySelector('.level-pass')
 			levelPass.classList.add('animate')
 
@@ -234,6 +234,7 @@ function MemoryGame() {
 				showResults={showResults}
 				handlePlayAgain={handlePlayAgain}
 				handleReturn={handleReturn}
+        level={level}
 			/>
 		</>
 	)

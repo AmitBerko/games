@@ -3,7 +3,7 @@ import { useAuth } from '../components/AuthProvider'
 import { useNavigate } from 'react-router-dom'
 
 function Homepage() {
-	const { user, signOut } = useAuth()
+	const { userData, signOut } = useAuth()
   const navigate = useNavigate()
 
 	async function handleSignOut() {
@@ -13,7 +13,7 @@ function Homepage() {
 	return (
 		<div className="homepage">
 			<div className="user-greeting">
-				Hello {user.email.slice(0, user.email.indexOf('@'))}
+				Hello {userData.username}
 				<button onClick={handleSignOut}>LOG OUT</button>
 			</div>
 			{/* <div className="bubble"></div>

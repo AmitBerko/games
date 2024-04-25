@@ -3,9 +3,9 @@ import { useAuth } from './AuthProvider'
 import { Navigate } from 'react-router-dom'
 
 function ProtectedRoute({ component: Component, ...props }) {
-	const { user } = useAuth()
+	const { userData } = useAuth()
 
-	return user ? <Component {...props} /> : <Navigate to="/login" />
+	return userData ? <Component {...props} /> : <Navigate to="/login" />
 }
 
 export default ProtectedRoute

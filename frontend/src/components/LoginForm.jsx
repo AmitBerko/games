@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from './AuthProvider'
 import { Alert } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
@@ -8,21 +8,27 @@ function LoginForm() {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [errorMessage, setErrorMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
-	const { login } = useAuth()
+	const [isLoading, setIsLoading] = useState(false)
+	const navigate = useNavigate()
+	const { login, userData } = useAuth()
+
+	useEffect(() => {
+		if (userData) {
+			setIsLoading(false)
+			navigate('/')
+		}
+	}, [userData])
 
 	async function handleLogin(e) {
 		e.preventDefault()
 
 		try {
-      setIsLoading(true)
+			setIsLoading(true)
 			await login(email, password)
-      setErrorMessage('')
-      navigate('/')
-      
+			setErrorMessage('')
 		} catch (error) {
-      console.log(error.code)
+			console.log(error.code)
+			setIsLoading(false)
 			switch (error.code) {
 				case 'auth/invalid-email':
 					setErrorMessage('Please enter a valid email address.')
@@ -34,9 +40,7 @@ function LoginForm() {
 				default:
 					setErrorMessage('An error occurred. Please try again later.')
 			}
-		} finally {
-      setIsLoading(false)
-    }
+		}
 	}
 
 	return (
