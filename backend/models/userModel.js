@@ -5,7 +5,10 @@ const UserSchema = new mongoose.Schema(
 		uid: {
 			type: String,
 			required: [true, 'Uid is a required field'],
-      unique: true,
+			unique: true,
+		},
+		username: {
+			type: String,
 		},
 		speedGameBest: {
 			type: Number,
