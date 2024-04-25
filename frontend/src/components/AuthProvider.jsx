@@ -8,24 +8,22 @@ const AuthContext = createContext()
 export default function AuthProvider({ children }) {
 	const [isLoading, setIsLoading] = useState(true)
 	const [userData, setUserData] = useState('')
+  const [authOperation, setAuthOperation] = useState('')
 
 	useEffect(() => {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
-			if (user && !userData) {
-				const hasUserJustRegistered = user.metadata.creationTime === user.metadata.lastSignInTime
-				if (!hasUserJustRegistered) {
-					console.log('fetching data in useeffect')
-					const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/${user.uid}`)
-					setUserData(response.data)
-				}
+			if (user && !userData && authOperation !== 'signup') {
+				const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/${user.uid}`)
+				setUserData(response.data)
 			}
 			setIsLoading(false)
 		})
 
 		return () => unsubscribe()
-	}, [])
+	}, [authOperation])
 
 	async function signup(email, username, password) {
+    setAuthOperation('signup')
 		const creds = await createUserWithEmailAndPassword(auth, email, password)
 		const user = creds.user
 
@@ -41,6 +39,7 @@ export default function AuthProvider({ children }) {
 	}
 
 	async function login(email, password) {
+    setAuthOperation('login')
 		await signInWithEmailAndPassword(auth, email, password)
 	}
 
