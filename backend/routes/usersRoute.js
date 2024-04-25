@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
 		const users = await User.find({})
 		res.status(200).json(users)
 	} catch (error) {
-		res.status(500).json({ error: error.message })
+		res.status(500).json({ error: `Failed to get all users: ${error.message}` })
 	}
 })
 
@@ -24,17 +24,17 @@ router.get('/:uid', async (req, res) => {
 		}
 		res.status(200).json(user)
 	} catch (error) {
-		res.status(500).json({ error: error.message })
+		res.status(500).json({ error: `Failed to get user by uid: ${error.message}` })
 	}
 })
 
 // Create a new user
 router.post('/', async (req, res) => {
-	const { uid, speedGameBest, memoryGameBest } = req.body
+	const { uid, username, speedGameBest, memoryGameBest } = req.body
 
 	try {
-		await User.create({ uid, speedGameBest, memoryGameBest })
-		res.status(201).json({ message: 'Added user successfuly' })
+		const user = await User.create({ uid, username, speedGameBest, memoryGameBest })
+		res.status(201).json(user)
 	} catch (error) {
 		res.status(500).json({ error: `Failed to create new user: ${error}` })
 	}
@@ -58,8 +58,7 @@ router.put('/:uid', async (req, res) => {
 			res.status(200).json({ message: 'User updated successfuly' })
 		}
 	} catch (error) {
-		console.log(`Failed to update user: ${error}`)
-		res.status(500).json({ error: 'Failed to update user' })
+		res.status(500).json({ error: `Failed to update user: ${error.message}` })
 	}
 })
 
