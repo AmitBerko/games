@@ -79,7 +79,7 @@ function LoginForm() {
 							<span>Register</span>
 						</label>
 						{errorMessage && (
-							<Alert className="form-alert fs-6 text-start p-2 mt-2 mt-sm-3" variant="danger">
+							<Alert className="form-alert fs-6 text-start m-0 p-2 mt-2 mt-sm-3" variant="danger">
 								{errorMessage}
 							</Alert>
 						)}
