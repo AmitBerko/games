@@ -7,11 +7,16 @@ const AuthContext = createContext()
 
 export default function AuthProvider({ children }) {
 	const [isLoading, setIsLoading] = useState(true)
-	const [userData, setUserData] = useState('')
-  const [authOperation, setAuthOperation] = useState('')
+	const [userData, setUserData] = useState()
+	const [authOperation, setAuthOperation] = useState('')
 
 	useEffect(() => {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
+			if (!user) {
+				setUserData()
+			}
+
+			// Dont fetch again if it's a signup, because we already have the data
 			if (user && !userData && authOperation !== 'signup') {
 				const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/${user.uid}`)
 				setUserData(response.data)
@@ -23,7 +28,7 @@ export default function AuthProvider({ children }) {
 	}, [authOperation])
 
 	async function signup(email, username, password) {
-    setAuthOperation('signup')
+		setAuthOperation('signup')
 		const creds = await createUserWithEmailAndPassword(auth, email, password)
 		const user = creds.user
 
@@ -34,22 +39,27 @@ export default function AuthProvider({ children }) {
 		})
 
 		setUserData(response.data)
-
-		return user
 	}
 
 	async function login(email, password) {
-    setAuthOperation('login')
+		setAuthOperation('login')
 		await signInWithEmailAndPassword(auth, email, password)
 	}
 
 	async function signOut() {
-		setUserData('')
 		return await auth.signOut()
 	}
 
+	async function updateUserData() {
+    // Call this function after a change is done in order to use the updated userData state
+		const updatedResponse = await axios.get(
+			`${import.meta.env.VITE_SERVER_URL}/users/${userData.uid}`
+		)
+		setUserData(updatedResponse.data)
+	}
+
 	return (
-		<AuthContext.Provider value={{ signup, login, signOut, userData }}>
+		<AuthContext.Provider value={{ signup, login, signOut, userData, updateUserData }}>
 			{!isLoading && children}
 		</AuthContext.Provider>
 	)

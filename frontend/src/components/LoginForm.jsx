@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useAuth } from './AuthProvider'
 import { Alert } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
 import { Spinner } from 'react-bootstrap'
 
 function LoginForm() {
@@ -9,15 +8,7 @@ function LoginForm() {
 	const [password, setPassword] = useState('')
 	const [errorMessage, setErrorMessage] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
-	const navigate = useNavigate()
-	const { login, userData } = useAuth()
-
-	useEffect(() => {
-		if (userData) {
-			setIsLoading(false)
-			navigate('/')
-		}
-	}, [userData])
+	const { login } = useAuth()
 
 	async function handleLogin(e) {
 		e.preventDefault()
