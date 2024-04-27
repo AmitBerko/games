@@ -7,9 +7,15 @@ const UserSchema = new mongoose.Schema(
 			required: [true, 'Uid is a required field'],
 			unique: true,
 		},
+    email: {
+      type: String,
+    },
 		username: {
 			type: String,
 		},
+    password: { // (Hashed password)
+      type: String,
+    },
 		speedGameBest: {
 			type: Number,
 			default: 0,

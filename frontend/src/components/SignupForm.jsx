@@ -11,45 +11,41 @@ function SignupForm() {
 	const [isLoading, setIsLoading] = useState(false)
 	const [errorMessage, setErrorMessage] = useState()
 	const { signup } = useAuth()
-  const navigate = useNavigate()
+	const navigate = useNavigate()
+
+	function isValidEmail(email) {
+		// Regular expression pattern for validating email format
+		const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+		return emailPattern.test(email)
+	}
+
+	function isValidUsername(username) {
+		// Only alphabetical letters
+		const usernamePattern = /^[a-zA-Z]+$/
+		return usernamePattern.test(username)
+	}
 
 	async function handleRegister(e) {
-		try {
-			e.preventDefault()
-			setIsLoading(true)
-      const regex = /^[a-zA-Z]+$/
-      if (!regex.test(username)) {
-        setErrorMessage('Username must only contain alphabetical letters')
-        return
-      }
-
-      if (username.length <= 4) {
-        setErrorMessage('Username must be atleast 5 letters')
-        return
-      }
-
-			const account = await signup(email, username, password)
-      navigate('/')
-			setErrorMessage('')
-			console.log(account)
-		} catch (error) {
-			switch (error.code) {
-				case 'auth/invalid-email':
-					setErrorMessage('Invalid email address.')
-					break
-				case 'auth/email-already-in-use':
-					setErrorMessage('Email is already registered. Please sign in or use a different email.')
-					break
-				case 'auth/weak-password':
-					setErrorMessage('Password is too weak. Please use a stronger password.')
-					break
-
-				default:
-					setErrorMessage('An error occurred. Please try again later.')
-			}
-		} finally {
-			setIsLoading(false)
+		e.preventDefault()
+		if (!isValidUsername(username)) {
+			return setErrorMessage('Username must only contain alphabetical letters')
+		} else if (!isValidEmail(email)) {
+			return setErrorMessage('Invalid email address')
 		}
+
+		if (username.length <= 4) {
+			setErrorMessage('Username must be atleast 5 letters')
+			return
+		}
+
+		setIsLoading(true)
+		const response = await signup(email, username, password) // the response should have the accessToken
+		setIsLoading(false)
+		if (response.error) {
+			return setErrorMessage(response.error)
+		}
+    localStorage.setItem('accessToken', response)
+		setErrorMessage('')
 	}
 
 	return (

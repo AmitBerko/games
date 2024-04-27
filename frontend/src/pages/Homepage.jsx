@@ -3,12 +3,16 @@ import { useAuth } from '../components/AuthProvider'
 import { useNavigate } from 'react-router-dom'
 
 function Homepage() {
-	const { userData, signOut } = useAuth()
+	const { userData, signOut, updateUserData } = useAuth()
   const navigate = useNavigate()
 
 	async function handleSignOut() {
 		await signOut()
 	}
+
+  async function testing() {
+    await updateUserData({username: 'pleasework'})
+  }
 
 	return (
 		<div className="homepage">
@@ -33,7 +37,7 @@ function Homepage() {
 					<button onClick={() => navigate('/memory-game')} className="games-menu-btn fs-1">
 						<span>Memory Game</span>
 					</button>
-					<button className="games-menu-btn fs-1">
+					<button onClick={() => testing()} className="games-menu-btn fs-1">
 						<span>Leaderboard</span>
 					</button>
 				</div>

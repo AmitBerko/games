@@ -12,26 +12,15 @@ function LoginForm() {
 
 	async function handleLogin(e) {
 		e.preventDefault()
+		setIsLoading(true)
+		const response = await login(email, password)
+    setIsLoading(false)
 
-		try {
-			setIsLoading(true)
-			await login(email, password)
-			setErrorMessage('')
-		} catch (error) {
-			console.log(error.code)
-			setIsLoading(false)
-			switch (error.code) {
-				case 'auth/invalid-email':
-					setErrorMessage('Please enter a valid email address.')
-					break
-				case 'auth/invalid-credential':
-					setErrorMessage('Invalid email or password.')
-					break
-
-				default:
-					setErrorMessage('An error occurred. Please try again later.')
-			}
-		}
+    if (response.error) {
+      return setErrorMessage(response.error)
+    }
+		console.log('the user is', response)
+		setErrorMessage('')
 	}
 
 	return (

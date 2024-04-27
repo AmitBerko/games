@@ -1,14 +1,23 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { auth } from '../firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import axios from 'axios'
+import axios from '../api/axios'
 
 const AuthContext = createContext()
+
+const getTokenFromLocalStorage = () => localStorage.getItem('accessToken')
 
 export default function AuthProvider({ children }) {
 	const [isLoading, setIsLoading] = useState(true)
 	const [userData, setUserData] = useState()
+  const [userAccessToken, setUserAccessToken] = useState(getTokenFromLocalStorage())
 	const [authOperation, setAuthOperation] = useState('')
+
+  useEffect(() => {
+    if (userAccessToken) {
+      
+    }
+  }, [userAccessToken])
 
 	useEffect(() => {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -16,11 +25,12 @@ export default function AuthProvider({ children }) {
 				setUserData()
 			}
 
-			// Dont fetch again if it's a signup, because we already have the data
-			if (user && !userData && authOperation !== 'signup') {
-				const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/${user.uid}`)
-				setUserData(response.data)
-			}
+			// // Dont fetch again if it's a signup, because we already have the data
+			// if (user && !userData && authOperation !== 'signup') {
+			//   console.log(await user.getIdToken())
+			// 	const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/${user.uid}`)
+			// 	setUserData(response.data)
+			// }
 			setIsLoading(false)
 		})
 
@@ -28,32 +38,37 @@ export default function AuthProvider({ children }) {
 	}, [authOperation])
 
 	async function signup(email, username, password) {
-		setAuthOperation('signup')
-		const creds = await createUserWithEmailAndPassword(auth, email, password)
-		const user = creds.user
-
-		// Create a new user in the db
-		const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users`, {
-			uid: user.uid,
-			username,
-		})
-
-		setUserData(response.data)
+		try {
+			const response = await axios.post('/users', {
+				email,
+				username,
+				password,
+			})
+			setUserData(response.data)
+			return response.data
+		} catch (error) {
+			return error.response.data
+		}
 	}
 
 	async function login(email, password) {
-		setAuthOperation('login')
-		await signInWithEmailAndPassword(auth, email, password)
+		try {
+			const response = await axios.post('/users/login', { email, password })
+			setUserData(response.data)
+			return response.data
+		} catch (error) {
+			return error.response.data
+		}
 	}
 
 	async function signOut() {
-		return await auth.signOut()
+		setUserData()
 	}
 
-	async function updateUserData() {
-    // Call this function after a change is done in order to use the updated userData state
-		const updatedResponse = await axios.get(
-			`${import.meta.env.VITE_SERVER_URL}/users/${userData.uid}`
+	async function updateUserData(newData) {
+		const updatedResponse = await axios.put(
+			`${import.meta.env.VITE_SERVER_URL}/users/${userData.uid}`,
+			newData
 		)
 		setUserData(updatedResponse.data)
 	}
