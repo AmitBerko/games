@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { auth } from '../firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import axios from 'axios'
+import axios from '../api/axios'
 
 const AuthContext = createContext()
 
@@ -13,12 +13,12 @@ export default function AuthProvider({ children }) {
 	useEffect(() => {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
 			if (!user) {
-				setUserData()
+        setUserData()
 			}
 
 			// Dont fetch again if it's a signup, because we already have the data
 			if (user && !userData && authOperation !== 'signup') {
-				const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/${user.uid}`)
+				const response = await axios.get(`/users/${user.uid}`)
 				setUserData(response.data)
 			}
 			setIsLoading(false)
@@ -33,7 +33,7 @@ export default function AuthProvider({ children }) {
 		const user = creds.user
 
 		// Create a new user in the db
-		const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users`, {
+		const response = await axios.post(`/users`, {
 			uid: user.uid,
 			username,
 		})
@@ -50,11 +50,13 @@ export default function AuthProvider({ children }) {
 		return await auth.signOut()
 	}
 
-	async function updateUserData() {
-    // Call this function after a change is done in order to use the updated userData state
-		const updatedResponse = await axios.get(
-			`${import.meta.env.VITE_SERVER_URL}/users/${userData.uid}`
-		)
+	async function updateUserData(newData) {
+    const token = auth.currentUser && await auth.currentUser.getIdToken()
+		const updatedResponse = await axios.put(`/users/${userData.uid}`, newData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
 		setUserData(updatedResponse.data)
 	}
 
