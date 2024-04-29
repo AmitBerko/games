@@ -11,24 +11,26 @@ function MemoryGame() {
 	const [correctIndexes, setCorrectIndexes] = useState([])
 	const [disableTiles, setDisableTiles] = useState(true)
 	const [correctIndexesCount, setCorrectIndexesCount] = useState(0) // To prevent dom manipulation
-  const navigate = useNavigate()
+	const navigate = useNavigate()
 	// Results modal
 	const [showResults, setShowResults] = useState(false)
 
 	const handlePlayAgain = () => {
-    // Bring all settings to default
+		// Bring all settings to default
 		removeSpecialClasses()
 		setCorrectIndexes([])
 		setCorrectIndexesCount(0)
 		setTriesLeft(3)
-		setLevel(1)
+    setGridLength(3)
+    // Fixed a bug regarding trying to "play again" after losing at level 1
+    setLevel((prevLevel) => (prevLevel === 1 ? 0 : 1))
 		setShowResults(false)
 	}
 
-  const handleReturn = () => {
-    setShowResults(false)
-    navigate('/')
-  }
+	const handleReturn = () => {
+		setShowResults(false)
+		navigate('/')
+	}
 
 	const levelConfig = {
 		1: { gridLength: 3, correctRatio: 0.4 },
@@ -99,12 +101,17 @@ function MemoryGame() {
 	}, [gridLength])
 
 	useEffect(() => {
+    // Fixed a bug
+		if (level === 0) {
+			return setLevel(1)
+		}
+
 		// If its level 1, have a 1 second delay, otherwise start immediately
 		const delay = level === 1 ? 1000 : 0
 		setTimeout(() => {
 			setCorrectIndexesCount(0)
 			setGridLength(() => {
-        // Use the current level's config. If it doesnt exist in the config, use the last one
+				// Use the current level's config. If it doesnt exist in the config, use the last one
 				const { gridLength, correctRatio } =
 					levelConfig[level] || levelConfig[Object.keys(levelConfig).length]
 				setCorrectIndexes(getRandomIndexes(gridLength, correctRatio))
@@ -234,7 +241,7 @@ function MemoryGame() {
 				showResults={showResults}
 				handlePlayAgain={handlePlayAgain}
 				handleReturn={handleReturn}
-        level={level}
+				level={level}
 			/>
 		</>
 	)

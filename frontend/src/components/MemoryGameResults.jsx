@@ -1,10 +1,20 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { useAuth } from './AuthProvider'
 
 function MemoryGameResults({ showResults, handlePlayAgain, handleReturn, level }) {
-	const { userData } = useAuth()
+	const { userData, updateUserData } = useAuth()
+
+	useEffect(() => {
+    console.log(userData)
+		// Update the user's data if he got a higher new score
+		if (showResults && level > userData.memoryGameBest) {
+      console.log('fetching')
+			updateUserData({ memoryGameBest: level })
+		}
+	}, [showResults])
+
 	return (
 		<>
 			<Modal show={showResults} onHide={handleReturn} backdrop="static" centered>
@@ -13,7 +23,11 @@ function MemoryGameResults({ showResults, handlePlayAgain, handleReturn, level }
 				</Modal.Header>
 				<Modal.Body className="text-center">
 					<div className="fs-4">You have reached level {level}</div>
-					<div className="fs-5">Your current best is: level {JSON.stringify(userData)} </div>
+					<div className="fs-5">
+						Your current best is: level{' '}
+						{level > userData.memoryGameBest ? level : userData.memoryGameBest}{' '}
+						{/* {userData.memoryGameBest} */}
+					</div>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button
