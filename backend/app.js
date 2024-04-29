@@ -2,6 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import usersRoute from './routes/usersRoute.js'
+import memoryRoute from './routes/memoryRoute.js'
 import cors from 'cors'
 
 dotenv.config()
@@ -13,6 +14,7 @@ app.use(cors({
 }))
 
 app.use('/users', usersRoute)
+app.use('/memory', memoryRoute)
 
 const port = 8080
 
