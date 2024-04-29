@@ -1,5 +1,6 @@
 import express from 'express'
 import User from '../models/userModel.js'
+import verifyFirebaseToken from '../middlewares/verifyFirebaseToken.js'
 
 const router = express.Router()
 
@@ -41,21 +42,25 @@ router.post('/', async (req, res) => {
 })
 
 // Update user by uid
-router.put('/:uid', async (req, res) => {
+router.put('/:uid', verifyFirebaseToken, async (req, res) => {
 	const { uid } = req.params
+
+	// Verify if the decoded token's UID matches the UID being updated. throw an error if they differ
+	if (req.user.uid !== uid) {
+		return res.status(400).json({ error: 'Unauthorized' })
+	}
 	const newData = req.body
 	try {
 		const allowedFields = {
 			speedGameBest: newData.speedGameBest,
 			memoryGameBest: newData.memoryGameBest,
 		}
-
-		const updatedUser = await User.findOneAndUpdate({ uid }, allowedFields)
+		const updatedUser = await User.findOneAndUpdate({ uid }, allowedFields, { new: true })
 
 		if (!updatedUser) {
 			res.status(404).json({ error: 'User not found' })
 		} else {
-			res.status(200).json({ message: 'User updated successfuly' })
+			res.status(200).json(updatedUser)
 		}
 	} catch (error) {
 		res.status(500).json({ error: `Failed to update user: ${error.message}` })
