@@ -1,4 +1,5 @@
 import express from 'express'
+import verifyFirebaseToken from '../middlewares/verifyFirebaseToken.js'
 
 const router = express.Router()
 
@@ -40,21 +41,46 @@ const levelsConfig = {
 	20: { gridLength: 7, correctRatio: 0.55 },
 }
 
-router.get('/getLevelData', (req, res) => {
-	// Return level x and x + 1 correct indexes
-	let result = { currentLevel: [], nextLevel: [] }
+let levelData = []
+let usersProgress = {}
+
+const getLevelData = () => {
 	const maxLevel = Object.keys(levelsConfig).length
-	const currentLevel = levelsConfig[level] || levelsConfig[maxLevel]
-	const nextLevel = levelsConfig[level + 1] || levelsConfig[maxLevel]
-	const currentGridLength = currentLevel.gridLength
-	const currentRatio = currentLevel.correctRatio
-	const nextGridLength = nextLevel.gridLength
-	const nextRatio = nextLevel.correctRatio
+	const currentLevelConfig = levelsConfig[level] || levelsConfig[maxLevel]
 
-	result.currentLevel = getRandomIndexes(currentGridLength, currentRatio)
-	result.nextLevel = getRandomIndexes(nextGridLength, nextRatio)
+	const { gridLength, correctRatio } = currentLevelConfig
+	let newLevelsData = {}
+	newLevelsData = getRandomIndexes(gridLength, correctRatio)
 
-	res.json(result)
+	return newLevelsData
+}
+
+router.get('/startGame', verifyFirebaseToken, (req, res) => {
+  usersProgress[req.user.token] = { level: 1 }
+	levelData = getLevelData()
+	res.json({ levelData })
+})
+
+router.get('/getLevelData', verifyFirebaseToken, (req, res) => {
+	// Return level x and x + 1 correct indexes
+	let newLevelData = getLevelData()
+
+	res.json(newLevelData)
+})
+
+router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
+	const { currentClicked } = req.body
+
+	// Check if user passed
+	let hasPassed = true
+	for (let i = 0; i < levelData.length; i++) {
+		if (!currentClicked.includes(levelData[i])) {
+			hasPassed = false
+			break
+		}
+	}
+
+	res.json({ hasPassed })
 })
 
 export default router
