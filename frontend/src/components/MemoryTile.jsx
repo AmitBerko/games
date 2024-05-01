@@ -1,10 +1,11 @@
 import React from 'react'
 
-function MemoryTile({ isCorrect, handleTileClick }) {
+function MemoryTile({ isCorrect, handleTileClick, id }) {
 	return (
 		<div
-			className={`memory-tile ${isCorrect ? 'correct-tile' : ''}`}
+			className='memory-tile'
 			onClick={handleTileClick}
+      id={id}
 		></div>
 	)
 }

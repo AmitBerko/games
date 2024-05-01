@@ -9,40 +9,54 @@ function MemoryGame() {
 	const [level, setLevel] = useState(1)
 	const [triesLeft, setTriesLeft] = useState(3)
 	const [gridLength, setGridLength] = useState(3) // Start with a 3x3 grid
-	const [levelGoal, setLevelGoal] = useState({})
+	const [levelGoal, setLevelGoal] = useState([])
 	const [currentClicked, setCurrentClicked] = useState([])
+	const [gameId, setGameId] = useState('')
+	const { userData } = useAuth()
 
-  const runOnce = useRef(false)
+	const runOnce = useRef(false)
+	const requestHeader = {
+		headers: { Authorization: `Bearer ${userData.token}` },
+	}
 
 	useEffect(() => {
 		const getInitialData = async () => {
-			const response = await axios.get('/memory/getLevelData')
-			setLevelGoal(response.data)
+			// Obfuscate the response later
+			console.log(userData)
+			const response = await axios.get('/memory/startGame', requestHeader)
+			console.log(response.data.levelData)
+			setLevelGoal(response.data.levelData)
+			setGameId(response.data.gameId)
 		}
 
-		if (!runOnce.current) getInitialData()
+		// Run it only once
+		if (!runOnce.current) {
+			getInitialData()
+		}
 
-    return () => runOnce.current = true
+		return () => (runOnce.current = true)
 	}, [])
 
 	useEffect(() => {
-    // let goalTilesElements = []
-    // for (let i = 0; i < levelGoal.currentLevel.length; i++) {
-    //   goalTilesElements = document.getElementById()
-    // }
-    const goalTilesElements = [...document.querySelectorAll('.correct-tile')]
+		// let goalTilesElements = []
+		// for (let i = 0; i < levelGoal.currentLevel.length; i++) {
+		//   goalTilesElements = document.getElementById()
+		// }
+		let goalTilesElements = []
+		for (let i = 0; i < levelGoal.length; i++) {
+			console.log(`#tile${levelGoal[i]}`)
+			goalTilesElements.push(document.querySelector(`#tile${levelGoal[i]}`))
+		}
+		// const goalTilesElements = [...document.querySelectorAll('.correct-tile')]
 		// if (goalTilesElements.length === 0) return
 		goalTilesElements.map((tile) => {
-			tile.classList.add('animate-flip')
+			tile.classList.add('correct-tile', 'animate-flip')
 		})
+
 		setTimeout(() => {
 			goalTilesElements.map((tile) => {
-				tile.classList.add('animate-unflip')
 				tile.classList.remove('correct-tile', 'animate-flip')
 				// setDisableTiles(false)
-				setTimeout(() => {
-					tile.classList.remove('animate-unflip')
-				}, 300)
 			})
 		}, 2000)
 	}, [levelGoal])
@@ -67,7 +81,7 @@ function MemoryGame() {
 		const tile = document.getElementsByClassName('memory-tile')[tileIndex]
 		// if (!tile || disableTiles) return
 		// if (tile.classList.contains('correct-tile') || tile.classList.contains('wrong-tile')) return
-		if (levelGoal.currentLevel.includes(tileIndex)) {
+		if (levelGoal.includes(tileIndex)) {
 			// If correct
 			tile.classList.add('correct-tile')
 			tile.classList.add('animate-flip')
@@ -79,24 +93,61 @@ function MemoryGame() {
 		}
 	}
 
-  const hasPassed = () => {
-    if (Object.keys(levelGoal).length === 0) return false
-    for (let i = 0; i < levelGoal.currentLevel.length; i++) {
-      if (!currentClicked.includes(levelGoal.currentLevel[i])) {
-        return false
-      }
-    }
+	const hasPassed = () => {
+		if (Object.keys(levelGoal).length === 0) return false
+		for (let i = 0; i < levelGoal.length; i++) {
+			if (!currentClicked.includes(levelGoal[i])) {
+				return false
+			}
+		}
 
-    return true
-  }
+		return true
+	}
 
-  useEffect(() => {
-    console.log(hasPassed())
-  }, [currentClicked])
+	useEffect(() => {
+		const checkIfPassed = async () => {
+			if (hasPassed()) {
+				// Make the level pass animation
+				const levelPass = document.querySelector('.level-pass')
+				levelPass.classList.add('animate')
+
+				// Verify on the server and receive the next level's data
+				const serverVerification = await axios.post(
+					'memory/checkSolution',
+					{ currentClicked },
+					requestHeader
+				)
+				if (!serverVerification.data.hasPassed) return
+				setCurrentClicked([])
+				setLevel((prevLevel) => prevLevel + 1)
+				const tiles = [...document.querySelectorAll('.memory-tile')]
+				tiles.map((tile) => {
+					tile.classList.remove('correct-tile', 'animate-flip', 'wrong-tile')
+				})
+				levelPass.classList.remove('animate')
+
+				const response = await axios.get('/memory/getLevelData', requestHeader)
+				console.log('response is', response.data)
+				setLevelGoal(response.data)
+			}
+		}
+
+		checkIfPassed()
+	}, [currentClicked])
+
+	useEffect(() => {
+		if (level === 1) return
+
+		const getLevelData = async () => {
+			axios.get('')
+		}
+	}, [level])
 
 	return (
 		<>
 			{currentClicked}
+			<br></br>
+			{gameId}
 			<div className="memory-game-container">
 				<div className="level-tries fs-1">
 					<p className="level">Level {level}</p>
@@ -109,8 +160,9 @@ function MemoryGame() {
 					{Array.from({ length: gridLength * gridLength }).map((_, index) => (
 						<MemoryTile
 							key={`tile${index}`}
+							id={`tile${index}`}
 							handleTileClick={() => handleTileClick(index)}
-							isCorrect={levelGoal.currentLevel?.includes(index)}
+							// isCorrect={levelGoal.includes(index)}
 						/>
 					))}
 				</div>
@@ -292,8 +344,8 @@ export default MemoryGame
 // 	// Means we passed the level
 // 	if (correctIndexesCount === correctIndexes.length && correctIndexes.length > 0) {
 // 		setDisableTiles(true)
-// 		const levelPass = document.querySelector('.level-pass')
-// 		levelPass.classList.add('animate')
+// const levelPass = document.querySelector('.level-pass')
+// levelPass.classList.add('animate')
 
 // 		setTimeout(() => {
 // 			// 1 second after passing the level, remove all correct and wrong tiles classes

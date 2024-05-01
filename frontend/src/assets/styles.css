@@ -480,12 +480,13 @@ body {
 	background-color: rgb(150, 150, 150);
 	cursor: pointer;
 	border-radius: 0.4rem;
-	/* max-width: 100px; */
 	aspect-ratio: 1;
+  transition: transform 0.2s linear, background-color 0s 0.1s;
 }
 
 .memory-tile.correct-tile {
 	cursor: default;
+  background-color: #87cefa;
 }
 
 .memory-tile.wrong-tile {
@@ -494,12 +495,7 @@ body {
 }
 
 .correct-tile.animate-flip {
-	animation: flip-tile 0.2s linear, change-color 0s 0.1s linear;
-	animation-fill-mode: forwards;
-}
-
-.memory-tile.animate-unflip {
-	animation: revert-flip-tile 0.2s linear, revert-change-color 0s 0.1s linear;
+  transform: rotateX(180deg);
 }
 
 .level-pass {
@@ -520,46 +516,6 @@ body {
 @keyframes level-pass {
 	to {
 		opacity: 0.25;
-	}
-}
-
-@keyframes flip-tile {
-	from {
-		transform: rotateX(0deg);
-	}
-
-	to {
-		transform: rotateX(180deg);
-	}
-}
-
-@keyframes change-color {
-	from {
-		background-color: initial;
-	}
-
-	to {
-		background-color: #87cefa;
-	}
-}
-
-@keyframes revert-flip-tile {
-	0% {
-		transform: rotateX(180deg);
-	}
-
-	100% {
-		transform: rotateX(0deg);
-	}
-}
-
-@keyframes revert-change-color {
-	0% {
-		background-color: #87cefa;
-	}
-
-	100% {
-		background-color: initial;
 	}
 }
 
