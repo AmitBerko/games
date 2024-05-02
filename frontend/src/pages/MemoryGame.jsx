@@ -11,7 +11,8 @@ function MemoryGame() {
 	const [gridLength, setGridLength] = useState(3) // Start with a 3x3 grid
 	const [levelGoal, setLevelGoal] = useState([])
 	const [currentClicked, setCurrentClicked] = useState([])
-	const [gameId, setGameId] = useState('')
+	const [disableTiles, setDisableTiles] = useState(true)
+  const [showResults, setShowResults] = useState(false)
 	const { userData } = useAuth()
 
 	const runOnce = useRef(false)
@@ -22,11 +23,10 @@ function MemoryGame() {
 	useEffect(() => {
 		const getInitialData = async () => {
 			// Obfuscate the response later
-			console.log(userData)
 			const response = await axios.get('/memory/startGame', requestHeader)
-			console.log(response.data.levelData)
-			setLevelGoal(response.data.levelData)
-			setGameId(response.data.gameId)
+			setTimeout(() => {
+				setLevelGoal(response.data.correctIndexes)
+			}, 1000)
 		}
 
 		// Run it only once
@@ -42,9 +42,9 @@ function MemoryGame() {
 		// for (let i = 0; i < levelGoal.currentLevel.length; i++) {
 		//   goalTilesElements = document.getElementById()
 		// }
+		setDisableTiles(true)
 		let goalTilesElements = []
 		for (let i = 0; i < levelGoal.length; i++) {
-			console.log(`#tile${levelGoal[i]}`)
 			goalTilesElements.push(document.querySelector(`#tile${levelGoal[i]}`))
 		}
 		// const goalTilesElements = [...document.querySelectorAll('.correct-tile')]
@@ -56,7 +56,7 @@ function MemoryGame() {
 		setTimeout(() => {
 			goalTilesElements.map((tile) => {
 				tile.classList.remove('correct-tile', 'animate-flip')
-				// setDisableTiles(false)
+				setDisableTiles(false)
 			})
 		}, 2000)
 	}, [levelGoal])
@@ -75,6 +75,7 @@ function MemoryGame() {
 	}, [gridLength])
 
 	const handleTileClick = (tileIndex) => {
+		if (disableTiles) return
 		if (currentClicked.includes(tileIndex)) return
 		setCurrentClicked((prevClicked) => [...prevClicked, tileIndex])
 
@@ -85,7 +86,6 @@ function MemoryGame() {
 			// If correct
 			tile.classList.add('correct-tile')
 			tile.classList.add('animate-flip')
-			// setCorrectIndexesCount((prevLength) => prevLength + 1)
 		} else {
 			// If wrong
 			tile.classList.add('wrong-tile')
@@ -118,17 +118,27 @@ function MemoryGame() {
 					requestHeader
 				)
 				if (!serverVerification.data.hasPassed) return
+
+				// 1.2 second after passing, remove all special tiles
+				await new Promise((resolve) => setTimeout(resolve, 1200))
 				setCurrentClicked([])
-				setLevel((prevLevel) => prevLevel + 1)
 				const tiles = [...document.querySelectorAll('.memory-tile')]
 				tiles.map((tile) => {
 					tile.classList.remove('correct-tile', 'animate-flip', 'wrong-tile')
 				})
 				levelPass.classList.remove('animate')
 
+				// Get the next level's data
 				const response = await axios.get('/memory/getLevelData', requestHeader)
-				console.log('response is', response.data)
-				setLevelGoal(response.data)
+
+				// After 0.6 seconds update the gridLength
+				await new Promise((resolve) => setTimeout(resolve, 600))
+				setGridLength(response.data.gridLength)
+
+        // 0.6 seconds later start the next level
+				await new Promise((resolve) => setTimeout(resolve, 600))
+				setLevelGoal(response.data.correctIndexes)
+				setLevel(response.data.level)
 			}
 		}
 
@@ -136,18 +146,31 @@ function MemoryGame() {
 	}, [currentClicked])
 
 	useEffect(() => {
-		if (level === 1) return
+		if (triesLeft === 3) return // Means we just started, so don't do anything
+		const heartIcon = document.querySelector('.fa-heart')
 
-		const getLevelData = async () => {
-			axios.get('')
+		// Make the heart shake
+		heartIcon.classList.add('fa-shake')
+		const handleAnimationEnd = () => {
+			// Stop the animation after it ends so it only runs once
+			heartIcon.classList.remove('fa-shake')
 		}
-	}, [level])
+
+		heartIcon.addEventListener('animationend', handleAnimationEnd)
+		if (triesLeft === 0) {
+			setDisableTiles(true)
+
+			// open up a results modal or something
+			setShowResults(true)
+		}
+
+		return () => {
+			heartIcon.removeEventListener('animationend', handleAnimationEnd)
+		}
+	}, [triesLeft])
 
 	return (
 		<>
-			{currentClicked}
-			<br></br>
-			{gameId}
 			<div className="memory-game-container">
 				<div className="level-tries fs-1">
 					<p className="level">Level {level}</p>
@@ -162,19 +185,17 @@ function MemoryGame() {
 							key={`tile${index}`}
 							id={`tile${index}`}
 							handleTileClick={() => handleTileClick(index)}
-							// isCorrect={levelGoal.includes(index)}
+							isDisabled={disableTiles}
 						/>
 					))}
 				</div>
 				<div></div>
 			</div>
 			<div className="level-pass"></div>
-			{/* <MemoryGameResults
+			<MemoryGameResults
 				showResults={showResults}
-				handlePlayAgain={handlePlayAgain}
-				handleReturn={handleReturn}
-				level={level}
-			/> */}
+        requestHeader={requestHeader}
+			/>
 		</>
 	)
 }
@@ -279,30 +300,6 @@ export default MemoryGame
 // 		})
 // 	}, delay)
 // }, [level])
-
-// useEffect(() => {
-// 	if (triesLeft === 3) return // Means we just started, so don't do anything
-// 	const heartIcon = document.querySelector('.fa-heart')
-
-// 	// Make the heart shake
-// 	heartIcon.classList.add('fa-shake')
-// 	const handleAnimationEnd = () => {
-// 		// Stop the animation after it ends so it only runs once
-// 		heartIcon.classList.remove('fa-shake')
-// 	}
-
-// 	heartIcon.addEventListener('animationend', handleAnimationEnd)
-// 	if (triesLeft === 0) {
-// 		setDisableTiles(true)
-
-// 		// open up a results modal or something
-// 		setShowResults(true)
-// 	}
-
-// 	return () => {
-// 		heartIcon.removeEventListener('animationend', handleAnimationEnd)
-// 	}
-// }, [triesLeft])
 
 // useEffect(() => {
 // 	const correctTiles = [...document.querySelectorAll('.correct-tile')]

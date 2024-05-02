@@ -1,9 +1,8 @@
 import express from 'express'
 import verifyFirebaseToken from '../middlewares/verifyFirebaseToken.js'
+import User from '../models/userModel.js'
 
 const router = express.Router()
-
-let level = 1 // Starting from 1
 
 function getRandomIndexes(gridLength, correctTilesRatio) {
 	// Create an array of all possible indexes
@@ -42,28 +41,27 @@ const levelsConfig = {
 }
 
 let levelData = []
-let usersProgress = {}
+let usersProgress = {} // { 'myjwttoken': {level: 1} }
 
-const getLevelData = () => {
+const getLevelData = (level) => {
 	const maxLevel = Object.keys(levelsConfig).length
 	const currentLevelConfig = levelsConfig[level] || levelsConfig[maxLevel]
 
 	const { gridLength, correctRatio } = currentLevelConfig
-	let newLevelsData = {}
-	newLevelsData = getRandomIndexes(gridLength, correctRatio)
-
-	return newLevelsData
+	const correctIndexes = getRandomIndexes(gridLength, correctRatio)
+	return { correctIndexes, level, gridLength }
 }
 
 router.get('/startGame', verifyFirebaseToken, (req, res) => {
-  usersProgress[req.user.token] = { level: 1 }
-	levelData = getLevelData()
-	res.json({ levelData })
+	usersProgress[req.user.token] = { level: 1 }
+	levelData = getLevelData(1)
+	res.json(levelData)
 })
 
 router.get('/getLevelData', verifyFirebaseToken, (req, res) => {
 	// Return level x and x + 1 correct indexes
-	let newLevelData = getLevelData()
+	const currentLevel = usersProgress[req.user.token].level
+	let newLevelData = getLevelData(currentLevel)
 
 	res.json(newLevelData)
 })
@@ -79,8 +77,40 @@ router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 			break
 		}
 	}
-
+	if (hasPassed) {
+		usersProgress[req.user.token].level++
+	}
 	res.json({ hasPassed })
 })
 
+router.get('/endGame', verifyFirebaseToken, async (req, res) => {
+	// Send data to display in results screen and update the db
+	try {
+		let usersCurrentBest = (await User.findOne({ uid: req.user.uid })).memoryGameBest
+		const currentLevel = usersProgress[req.user.token].level // Change usersprogress to userslevel
+
+		if (currentLevel > usersCurrentBest) {
+			await User.updateOne({ uid: req.user.uid }, { memoryGameBest: currentLevel })
+			usersCurrentBest = currentLevel // Update usersCurrentBest
+		}
+
+		delete usersProgress[req.user.token]
+		console.log(currentLevel)
+		res.json({ currentLevel, memoryGameBest: usersCurrentBest })
+	} catch (error) {
+		console.error('Error:', error)
+		res.status(500).json({ message: 'Internal server error' })
+	}
+})
+
 export default router
+
+/*
+
+• in frontend when user "passes" send it to here and verify.
+• if he passes send the next level. in addition to the level contents send the gridlength and current level
+• 
+• 
+• 
+
+*/
