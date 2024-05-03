@@ -12,7 +12,7 @@ function MemoryGame() {
 	const [levelGoal, setLevelGoal] = useState([])
 	const [currentClicked, setCurrentClicked] = useState([])
 	const [disableTiles, setDisableTiles] = useState(true)
-  const [showResults, setShowResults] = useState(false)
+	const [showResults, setShowResults] = useState(false)
 	const { userData } = useAuth()
 
 	const runOnce = useRef(false)
@@ -23,10 +23,14 @@ function MemoryGame() {
 	useEffect(() => {
 		const getInitialData = async () => {
 			// Obfuscate the response later
+			const startTime = Date.now()
 			const response = await axios.get('/memory/startGame', requestHeader)
+			const finishTime = Date.now()
+			const timeToWait = Math.max(1000 - (finishTime - startTime), 0)
+			// Wait a minimum of 1 second
 			setTimeout(() => {
 				setLevelGoal(response.data.correctIndexes)
-			}, 1000)
+			}, timeToWait)
 		}
 
 		// Run it only once
@@ -104,10 +108,15 @@ function MemoryGame() {
 		return true
 	}
 
+	function sleep(ms) {
+		return new Promise((resolve) => setTimeout(resolve, ms))
+	}
+
 	useEffect(() => {
 		const checkIfPassed = async () => {
 			if (hasPassed()) {
 				// Make the level pass animation
+				let time = Date.now()
 				const levelPass = document.querySelector('.level-pass')
 				levelPass.classList.add('animate')
 
@@ -118,9 +127,11 @@ function MemoryGame() {
 					requestHeader
 				)
 				if (!serverVerification.data.hasPassed) return
+        const serverVerificationTime = Date.now() - time
+        let timeToWait = Math.max(1200 - (serverVerificationTime), 0)
 
-				// 1.2 second after passing, remove all special tiles
-				await new Promise((resolve) => setTimeout(resolve, 1200))
+				// Wait a minimum of 1.2 seconds
+				await sleep(timeToWait)
 				setCurrentClicked([])
 				const tiles = [...document.querySelectorAll('.memory-tile')]
 				tiles.map((tile) => {
@@ -129,16 +140,18 @@ function MemoryGame() {
 				levelPass.classList.remove('animate')
 
 				// Get the next level's data
-				const response = await axios.get('/memory/getLevelData', requestHeader)
+        time = Date.now()
+				const nextLevelsData = await axios.get('/memory/getLevelData', requestHeader)
+        const levelsDataTime = Date.now() - time
+        timeToWait = Math.max(600 - levelsDataTime, 0)
+				// Wait for a minimum of 0.6 seconds
+				await sleep(timeToWait)
+				setGridLength(nextLevelsData.data.gridLength)
 
-				// After 0.6 seconds update the gridLength
-				await new Promise((resolve) => setTimeout(resolve, 600))
-				setGridLength(response.data.gridLength)
-
-        // 0.6 seconds later start the next level
-				await new Promise((resolve) => setTimeout(resolve, 600))
-				setLevelGoal(response.data.correctIndexes)
-				setLevel(response.data.level)
+				// 0.6 seconds later start the next level
+				await sleep(600)
+				setLevelGoal(nextLevelsData.data.correctIndexes)
+				setLevel(nextLevelsData.data.level)
 			}
 		}
 
@@ -192,10 +205,7 @@ function MemoryGame() {
 				<div></div>
 			</div>
 			<div className="level-pass"></div>
-			<MemoryGameResults
-				showResults={showResults}
-        requestHeader={requestHeader}
-			/>
+			<MemoryGameResults showResults={showResults} requestHeader={requestHeader} />
 		</>
 	)
 }
