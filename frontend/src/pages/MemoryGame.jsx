@@ -42,21 +42,16 @@ function MemoryGame() {
 	}, [])
 
 	useEffect(() => {
-		// let goalTilesElements = []
-		// for (let i = 0; i < levelGoal.currentLevel.length; i++) {
-		//   goalTilesElements = document.getElementById()
-		// }
 		setDisableTiles(true)
 		let goalTilesElements = []
 		for (let i = 0; i < levelGoal.length; i++) {
 			goalTilesElements.push(document.querySelector(`#tile${levelGoal[i]}`))
 		}
-		// const goalTilesElements = [...document.querySelectorAll('.correct-tile')]
-		// if (goalTilesElements.length === 0) return
+
 		goalTilesElements.map((tile) => {
 			tile.classList.add('correct-tile', 'animate-flip')
 		})
-
+  
 		setTimeout(() => {
 			goalTilesElements.map((tile) => {
 				tile.classList.remove('correct-tile', 'animate-flip')
@@ -84,8 +79,6 @@ function MemoryGame() {
 		setCurrentClicked((prevClicked) => [...prevClicked, tileIndex])
 
 		const tile = document.getElementsByClassName('memory-tile')[tileIndex]
-		// if (!tile || disableTiles) return
-		// if (tile.classList.contains('correct-tile') || tile.classList.contains('wrong-tile')) return
 		if (levelGoal.includes(tileIndex)) {
 			// If correct
 			tile.classList.add('correct-tile')
@@ -116,22 +109,24 @@ function MemoryGame() {
 		const checkIfPassed = async () => {
 			if (hasPassed()) {
 				// Make the level pass animation
-				let time = Date.now()
 				const levelPass = document.querySelector('.level-pass')
 				levelPass.classList.add('animate')
-
+        
 				// Verify on the server and receive the next level's data
+				let time = Date.now()
 				const serverVerification = await axios.post(
 					'memory/checkSolution',
 					{ currentClicked },
 					requestHeader
 				)
-				if (!serverVerification.data.hasPassed) return
+				if (!serverVerification.data.hasPassed) {
+          return
+        }
         const serverVerificationTime = Date.now() - time
-        let timeToWait = Math.max(1200 - (serverVerificationTime), 0)
+        let extraWaitTime = Math.max(1200 - (serverVerificationTime), 0)
 
 				// Wait a minimum of 1.2 seconds
-				await sleep(timeToWait)
+				await sleep(extraWaitTime)
 				setCurrentClicked([])
 				const tiles = [...document.querySelectorAll('.memory-tile')]
 				tiles.map((tile) => {
@@ -143,9 +138,9 @@ function MemoryGame() {
         time = Date.now()
 				const nextLevelsData = await axios.get('/memory/getLevelData', requestHeader)
         const levelsDataTime = Date.now() - time
-        timeToWait = Math.max(600 - levelsDataTime, 0)
+        extraWaitTime = Math.max(600 - levelsDataTime, 0)
 				// Wait for a minimum of 0.6 seconds
-				await sleep(timeToWait)
+				await sleep(extraWaitTime)
 				setGridLength(nextLevelsData.data.gridLength)
 
 				// 0.6 seconds later start the next level
@@ -205,7 +200,7 @@ function MemoryGame() {
 				<div></div>
 			</div>
 			<div className="level-pass"></div>
-			<MemoryGameResults showResults={showResults} requestHeader={requestHeader} />
+			<MemoryGameResults showResults={showResults} requestHeader={requestHeader} level={level} />
 		</>
 	)
 }

@@ -54,18 +54,8 @@ export default function AuthProvider({ children }) {
 		return await auth.signOut()
 	}
 
-	// async function updateUserData(newData) {
-	//   const token = auth.currentUser && await auth.currentUser.getIdToken()
-	// 	const updatedResponse = await axios.put(`/users/${userData.uid}`, newData, {
-	//     headers: {
-	//       'Authorization': `Bearer ${token}`
-	//     }
-	//   })
-	// 	setUserData(updatedResponse.data)
-	// }
-
 	return (
-		<AuthContext.Provider value={{ signup, login, signOut, userData }}>
+		<AuthContext.Provider value={{ signup, login, signOut, userData, setUserData }}>
 			{!isLoading && children}
 		</AuthContext.Provider>
 	)

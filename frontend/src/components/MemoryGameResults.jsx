@@ -5,20 +5,20 @@ import { useAuth } from './AuthProvider'
 import axios from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 
-function MemoryGameResults({ showResults, requestHeader }) {
+function MemoryGameResults({ showResults, requestHeader, level }) {
 	const navigate = useNavigate()
-  const [gameData, setGameData] = useState({})
+	const { userData, setUserData } = useAuth()
 	useEffect(() => {
 		const endGame = async () => {
 			if (!showResults) return
 
 			const response = await axios.get('/memory/endGame', requestHeader)
-			console.log(response.data)
-      setGameData(response.data)
+			setUserData((prevUserData) => {
+				return { ...prevUserData, memoryGameBest: response.data.memoryGameBest }
+			})
 		}
 
-    endGame()
-
+		endGame()
 	}, [showResults])
 
 	const handleReturn = () => {
@@ -32,12 +32,11 @@ function MemoryGameResults({ showResults, requestHeader }) {
 					<Modal.Title className="text-center w-100 fw-medium display-6">Game Results</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className="text-center">
-					<div className="fs-4">You have reached level {gameData.currentLevel}</div>
+					<div className="fs-4">You have reached level {level}</div>
 					<div className="fs-5">
 						Your current best is: level{' '}
-            {gameData.memoryGameBest}
-						{/* {level > userData.memoryGameBest ? level : userData.memoryGameBest}{' '} */}
-						{/* {userData.memoryGameBest} */}
+            {/* Doing this to evade delayed results */}
+						{level > userData.memoryGameBest ? level : userData.memoryGameBest}
 					</div>
 				</Modal.Body>
 				<Modal.Footer>

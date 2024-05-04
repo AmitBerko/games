@@ -40,8 +40,7 @@ const levelsConfig = {
 	20: { gridLength: 7, correctRatio: 0.55 },
 }
 
-let levelData = []
-let usersProgress = {} // { 'myjwttoken': {level: 1} }
+let usersLevel = {} // { 'myjwttoken': {level: 2, correctIndexes: [1,2,3], gridLength: 3, triesLeft: 3} }
 
 const getLevelData = (level) => {
 	const maxLevel = Object.keys(levelsConfig).length
@@ -53,53 +52,68 @@ const getLevelData = (level) => {
 }
 
 router.get('/startGame', verifyFirebaseToken, (req, res) => {
-	usersProgress[req.user.token] = { level: 1 }
-	levelData = getLevelData(1)
-	res.json(levelData)
+	const levelData = getLevelData(1)
+	usersLevel[req.user.token] = { ...levelData, triesLeft: 3 }
+	res.json(usersLevel[req.user.token])
 })
 
 router.get('/getLevelData', verifyFirebaseToken, (req, res) => {
 	// Return level x and x + 1 correct indexes
-	const currentLevel = usersProgress[req.user.token].level
+	const currentLevel = usersLevel[req.user.token].level
 	let newLevelData = getLevelData(currentLevel)
-
+	usersLevel[req.user.token] = newLevelData
 	res.json(newLevelData)
 })
 
 router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 	const { currentClicked } = req.body
-
-	// Check if user passed
 	let hasPassed = true
-	for (let i = 0; i < levelData.length; i++) {
-		if (!currentClicked.includes(levelData[i])) {
+	const levelData = usersLevel[req.user.token]
+
+  // Find out how many mistakes a user has done
+	let mistakes = 0
+	for (let i = 0; i < currentClicked.length; i++) {
+		if (!levelData.correctIndexes.includes(currentClicked[i])) {
+			mistakes++
+		}
+	}
+
+  // Check if user has passed the level
+	for (let i = 0; i < levelData.correctIndexes.length; i++) {
+		if (!currentClicked.includes(levelData.correctIndexes[i])) {
 			hasPassed = false
 			break
 		}
 	}
-	if (hasPassed) {
-		usersProgress[req.user.token].level++
+
+	usersLevel[req.user.token].triesLeft -= mistakes
+	if (usersLevel[req.user.token].triesLeft <= 0 || !hasPassed) {
+    delete usersLevel[req.user.token]
+		return res.json({ hasPassed: false })
 	}
-	res.json({ hasPassed })
+
+  usersLevel[req.user.token].level++
+	res.json({ hasPassed: true })
 })
 
 router.get('/endGame', verifyFirebaseToken, async (req, res) => {
 	// Send data to display in results screen and update the db
+	if (!usersLevel[req.user.token]) {
+		return res.status(500).json({ message: `Start a game before trying to end it` })
+	}
 	try {
 		let usersCurrentBest = (await User.findOne({ uid: req.user.uid })).memoryGameBest
-		const currentLevel = usersProgress[req.user.token].level // Change usersprogress to userslevel
-
+		const currentLevel = usersLevel[req.user.token].level
 		if (currentLevel > usersCurrentBest) {
 			await User.updateOne({ uid: req.user.uid }, { memoryGameBest: currentLevel })
 			usersCurrentBest = currentLevel // Update usersCurrentBest
 		}
 
-		delete usersProgress[req.user.token]
-		console.log(currentLevel)
+		delete usersLevel[req.user.token]
 		res.json({ currentLevel, memoryGameBest: usersCurrentBest })
 	} catch (error) {
 		console.error('Error:', error)
-		res.status(500).json({ message: 'Internal server error' })
+		res.status(500).json({ message: `Internal server error: ${error}` })
 	}
 })
 
