@@ -1,6 +1,7 @@
 import express from 'express'
 import verifyFirebaseToken from '../middlewares/verifyFirebaseToken.js'
 import User from '../models/userModel.js'
+import ObfuscateIndexes from '../misc/Obfuscator.js'
 
 const router = express.Router()
 
@@ -54,15 +55,20 @@ const getLevelData = (level) => {
 router.get('/startGame', verifyFirebaseToken, (req, res) => {
 	const levelData = getLevelData(1)
 	usersLevel[req.user.token] = { ...levelData, triesLeft: 3 }
-	res.json(usersLevel[req.user.token])
+	res.json({
+		...usersLevel[req.user.token],
+		correctIndexes: ObfuscateIndexes(usersLevel[req.user.token].correctIndexes),
+	})
 })
 
 router.get('/getLevelData', verifyFirebaseToken, (req, res) => {
-	// Return level x and x + 1 correct indexes
 	const currentLevel = usersLevel[req.user.token].level
 	let newLevelData = getLevelData(currentLevel)
-	usersLevel[req.user.token] = newLevelData
-	res.json(newLevelData)
+	usersLevel[req.user.token] = { ...newLevelData, triesLeft: usersLevel[req.user.token].triesLeft }
+	res.json({
+		...usersLevel[req.user.token],
+		correctIndexes: ObfuscateIndexes(usersLevel[req.user.token].correctIndexes),
+	})
 })
 
 router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
@@ -70,7 +76,7 @@ router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 	let hasPassed = true
 	const levelData = usersLevel[req.user.token]
 
-  // Find out how many mistakes a user has done
+	// Find out how many mistakes a user has done
 	let mistakes = 0
 	for (let i = 0; i < currentClicked.length; i++) {
 		if (!levelData.correctIndexes.includes(currentClicked[i])) {
@@ -78,7 +84,7 @@ router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 		}
 	}
 
-  // Check if user has passed the level
+	// Check if user has passed the level
 	for (let i = 0; i < levelData.correctIndexes.length; i++) {
 		if (!currentClicked.includes(levelData.correctIndexes[i])) {
 			hasPassed = false
@@ -87,12 +93,13 @@ router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 	}
 
 	usersLevel[req.user.token].triesLeft -= mistakes
+	// If a user tries to cheat, delete his current game data
 	if (usersLevel[req.user.token].triesLeft <= 0 || !hasPassed) {
-    delete usersLevel[req.user.token]
+		delete usersLevel[req.user.token]
 		return res.json({ hasPassed: false })
 	}
 
-  usersLevel[req.user.token].level++
+	usersLevel[req.user.token].level++
 	res.json({ hasPassed: true })
 })
 
@@ -106,7 +113,7 @@ router.get('/endGame', verifyFirebaseToken, async (req, res) => {
 		const currentLevel = usersLevel[req.user.token].level
 		if (currentLevel > usersCurrentBest) {
 			await User.updateOne({ uid: req.user.uid }, { memoryGameBest: currentLevel })
-			usersCurrentBest = currentLevel // Update usersCurrentBest
+			usersCurrentBest = currentLevel
 		}
 
 		delete usersLevel[req.user.token]
@@ -118,13 +125,3 @@ router.get('/endGame', verifyFirebaseToken, async (req, res) => {
 })
 
 export default router
-
-/*
-
-• in frontend when user "passes" send it to here and verify.
-• if he passes send the next level. in addition to the level contents send the gridlength and current level
-• 
-• 
-• 
-
-*/

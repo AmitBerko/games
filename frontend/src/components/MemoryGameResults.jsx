@@ -5,7 +5,7 @@ import { useAuth } from './AuthProvider'
 import axios from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 
-function MemoryGameResults({ showResults, requestHeader, level }) {
+function MemoryGameResults({ showResults, requestHeader, level, handlePlayAgain }) {
 	const navigate = useNavigate()
 	const { userData, setUserData } = useAuth()
 	useEffect(() => {
@@ -44,6 +44,7 @@ function MemoryGameResults({ showResults, requestHeader, level }) {
 						variant="primary"
 						// onClick={handlePlayAgain}
 						className="col-12 mx-0 col-sm me-sm-1"
+            onClick={handlePlayAgain}
 					>
 						Play Again
 					</Button>
