@@ -13,12 +13,14 @@ export default function AuthProvider({ children }) {
 	useEffect(() => {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
 			if (!user) {
-        setUserData()
+				setUserData()
 			}
 
 			// Dont fetch again if it's a signup, because we already have the data
 			if (user && !userData && authOperation !== 'signup') {
 				const response = await axios.get(`/users/${user.uid}`)
+				const token = await user.getIdToken()
+				response.data.token = token
 				setUserData(response.data)
 			}
 			setIsLoading(false)
@@ -38,6 +40,8 @@ export default function AuthProvider({ children }) {
 			username,
 		})
 
+		const token = await user.getIdToken()
+		response.data.token = token
 		setUserData(response.data)
 	}
 
@@ -50,18 +54,8 @@ export default function AuthProvider({ children }) {
 		return await auth.signOut()
 	}
 
-	async function updateUserData(newData) {
-    const token = auth.currentUser && await auth.currentUser.getIdToken()
-		const updatedResponse = await axios.put(`/users/${userData.uid}`, newData, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-		setUserData(updatedResponse.data)
-	}
-
 	return (
-		<AuthContext.Provider value={{ signup, login, signOut, userData, updateUserData }}>
+		<AuthContext.Provider value={{ signup, login, signOut, userData, setUserData }}>
 			{!isLoading && children}
 		</AuthContext.Provider>
 	)

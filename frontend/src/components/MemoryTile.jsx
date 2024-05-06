@@ -1,10 +1,12 @@
 import React from 'react'
 
-function MemoryTile({ isCorrect, handleTileClick }) {
+function MemoryTile({ isCorrect, handleTileClick, id, isDisabled }) {
 	return (
 		<div
-			className={`memory-tile ${isCorrect ? 'correct-tile' : ''}`}
+			className='memory-tile'
 			onClick={handleTileClick}
+      id={id}
+      style={{cursor: (isDisabled ? 'default' : '')}}
 		></div>
 	)
 }

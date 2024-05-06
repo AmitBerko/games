@@ -26,7 +26,7 @@ body {
 }
 
 .wrapper.expand {
-  height: 33.5rem;
+  height: 34.5rem;
 }
 
 #check:not(:checked) ~ .form-container.register-form {
@@ -53,7 +53,7 @@ body {
 	height: 29rem;
 	width: 32rem;
 	border-radius: 1.25rem;
-  transition: height 0.35s linear;
+  transition: height 0.35s ease-out;
 }
 
 .form-container {
@@ -63,7 +63,6 @@ body {
 	transform: translate(-50%, -50%);
 	display: flex;
 	flex-direction: column;
-	/* border-radius: 1.25rem; */
 	overflow: hidden;
 	width: 100%;
 	height: 100%;
@@ -80,7 +79,6 @@ body {
 
 .form-container.register-form {
 	z-index: 1;
-	/* opacity: 0.55; */
 	background-color: var(--bg-color);
 	transition: all 0.35s ease-out;
 	border-top-left-radius: 0;
@@ -480,12 +478,13 @@ body {
 	background-color: rgb(150, 150, 150);
 	cursor: pointer;
 	border-radius: 0.4rem;
-	/* max-width: 100px; */
 	aspect-ratio: 1;
+  transition: transform 0.2s linear, background-color 0s 0.1s;
 }
 
 .memory-tile.correct-tile {
 	cursor: default;
+  background-color: #87cefa;
 }
 
 .memory-tile.wrong-tile {
@@ -494,12 +493,7 @@ body {
 }
 
 .correct-tile.animate-flip {
-	animation: flip-tile 0.2s linear, change-color 0s 0.1s linear;
-	animation-fill-mode: forwards;
-}
-
-.memory-tile.animate-unflip {
-	animation: revert-flip-tile 0.2s linear, revert-change-color 0s 0.1s linear;
+  transform: rotateX(180deg);
 }
 
 .level-pass {
@@ -520,46 +514,6 @@ body {
 @keyframes level-pass {
 	to {
 		opacity: 0.25;
-	}
-}
-
-@keyframes flip-tile {
-	from {
-		transform: rotateX(0deg);
-	}
-
-	to {
-		transform: rotateX(180deg);
-	}
-}
-
-@keyframes change-color {
-	from {
-		background-color: initial;
-	}
-
-	to {
-		background-color: #87cefa;
-	}
-}
-
-@keyframes revert-flip-tile {
-	0% {
-		transform: rotateX(180deg);
-	}
-
-	100% {
-		transform: rotateX(0deg);
-	}
-}
-
-@keyframes revert-change-color {
-	0% {
-		background-color: #87cefa;
-	}
-
-	100% {
-		background-color: initial;
 	}
 }
 

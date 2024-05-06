@@ -1,19 +1,29 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { useAuth } from './AuthProvider'
+import axios from '../api/axios'
+import { useNavigate } from 'react-router-dom'
 
-function MemoryGameResults({ showResults, handlePlayAgain, handleReturn, level }) {
-	const { userData, updateUserData } = useAuth()
-
+function MemoryGameResults({ showResults, requestHeader, level, handlePlayAgain }) {
+	const navigate = useNavigate()
+	const { userData, setUserData } = useAuth()
 	useEffect(() => {
-    console.log(userData)
-		// Update the user's data if he got a higher new score
-		if (showResults && level > userData.memoryGameBest) {
-      console.log('fetching')
-			updateUserData({ memoryGameBest: level })
+		const endGame = async () => {
+			if (!showResults) return
+
+			const response = await axios.get('/memory/endGame', requestHeader)
+			setUserData((prevUserData) => {
+				return { ...prevUserData, memoryGameBest: response.data.memoryGameBest }
+			})
 		}
+
+		endGame()
 	}, [showResults])
+
+	const handleReturn = () => {
+		navigate('/')
+	}
 
 	return (
 		<>
@@ -25,15 +35,16 @@ function MemoryGameResults({ showResults, handlePlayAgain, handleReturn, level }
 					<div className="fs-4">You have reached level {level}</div>
 					<div className="fs-5">
 						Your current best is: level{' '}
-						{level > userData.memoryGameBest ? level : userData.memoryGameBest}{' '}
-						{/* {userData.memoryGameBest} */}
+            {/* Doing this to evade delayed results */}
+						{level > userData.memoryGameBest ? level : userData.memoryGameBest}
 					</div>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button
 						variant="primary"
-						onClick={handlePlayAgain}
+						// onClick={handlePlayAgain}
 						className="col-12 mx-0 col-sm me-sm-1"
+            onClick={handlePlayAgain}
 					>
 						Play Again
 					</Button>
