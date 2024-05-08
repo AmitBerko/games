@@ -7,6 +7,7 @@ import SpeedGame from './pages/SpeedGame'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './assets/styles.css'
 import MemoryGame from './pages/MemoryGame'
+import Leaderboard from './components/Leaderboard'
 
 const router = createBrowserRouter([
 	{
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
 		path: '/memory-game',
 		element: <ProtectedRoute component={MemoryGame} />,
 	},
+  {
+    path: '/leaderboard',
+    element: <Leaderboard />
+  },
 ])
 
 function App() {

@@ -67,4 +67,16 @@ router.put('/:uid', verifyFirebaseToken, async (req, res) => {
 	}
 })
 
+router.post('/getLeaderboard', async (req, res) => {
+  const { leaderboardMode } = req.body
+  const projection = {
+		username: 1,
+		[leaderboardMode]: 1,
+		_id: 0,
+	}
+
+  const users = await User.find({}, projection)
+  res.json(users)
+})
+
 export default router

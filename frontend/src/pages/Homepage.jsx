@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 function Homepage() {
 	const { userData, signOut } = useAuth()
-  const navigate = useNavigate()
+	const navigate = useNavigate()
 
 	async function handleSignOut() {
 		await signOut()
@@ -33,7 +33,7 @@ function Homepage() {
 					<button onClick={() => navigate('/memory-game')} className="games-menu-btn fs-1">
 						<span>Memory Game</span>
 					</button>
-					<button className="games-menu-btn fs-1">
+					<button onClick={() => navigate('/leaderboard')} className="games-menu-btn fs-1">
 						<span>Leaderboard</span>
 					</button>
 				</div>
