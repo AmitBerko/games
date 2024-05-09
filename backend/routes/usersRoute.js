@@ -75,7 +75,7 @@ router.post('/getLeaderboard', async (req, res) => {
 		_id: 0,
 	}
 
-  const users = await User.find({}, projection)
+  const users = await User.find({}, projection).sort({[leaderboardMode] : -1})
   res.json(users)
 })
 
