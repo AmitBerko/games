@@ -544,19 +544,26 @@ body {
 }
 
 .leaderboard-row-container {
-	width: 100%;
+	width: 75%;
+	max-width: 850px;
+	font-size: calc(1rem + 0.3vw);
 	display: grid;
-	grid-template-columns: 3rem 1fr 0.15fr;
+	grid-template-columns: 3rem 1fr calc(7rem + 1.5vw);
 	align-items: center;
+	overflow: hidden;
+	background-color: rgb(34, 38, 42);
+	border-bottom: solid 1px grey;
 }
 
-.leaderboard-row-container:last-child .leaderboard-index {
-	border-bottom-left-radius: 1rem;
+.leaderboard-row-container:first-child {
+	border-top-left-radius: 1rem;
+	border-top-right-radius: 1rem;
 }
 
 .leaderboard-row-container:last-child {
-  border-bottom-left-radius: 1rem;
-  border-bottom-right-radius: 1rem;
+	border-bottom-left-radius: 1rem;
+	border-bottom-right-radius: 1rem;
+	border-bottom: none;
 }
 
 .leaderboard-row-item {
@@ -571,8 +578,8 @@ body {
 	background-color: grey;
 }
 
-.leaderboard-row-container:first-child .leaderboard-index {
-	border-top-left-radius: 1rem;
+.leaderboard-select > * {
+	background-color: rgb(34, 38, 42);
 }
 
 .leaderboard-row-container:nth-child(2) > .leaderboard-index {
@@ -590,25 +597,36 @@ body {
 	color: rgb(128, 88, 44);
 }
 
-.leaderboard-row-container:nth-of-type(odd) {
-	background-color: rgb(33, 37, 41);
-}
-
-.leaderboard-row-container:nth-of-type(even) {
-	background-color: var(--form1-color);
-}
-
 .leaderboard-row-container:first-child {
-	border-radius: 1rem;
+	background-color: var(--form1-color);
+	border-bottom: none;
 }
 
 .leaderboard-select {
 	width: 100%;
 	height: 100%;
+  border: none;
 	border-radius: 0;
-  border-top-right-radius: 1rem;
-	border-top: none;
-	border-bottom: none;
+	background-color: inherit;
+	border-left: 1px rgb(173, 216, 230) solid;
+}
+
+.leaderboard-select:focus, .leaderboard-select:active {
+  box-shadow: none;
+  outline: none;
+}
+
+.spinner-container {
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.leaderboard-spinner {
+	width: calc(5rem + 3vw);
+	height: calc(5rem + 3vw);
+	font-size: calc(2rem + 2vw);
 }
 
 .leaderboard-row-container:first-child > .leaderboard-row-item,
@@ -656,6 +674,11 @@ body {
 	.games-menu-btn {
 		margin: 1rem;
 	}
+
+	.leaderboard-row-container {
+		width: 100%;
+		grid-template-columns: 2.5rem 1fr 7.25rem;
+	}
 }
 
 @media (max-width: 520px) {
@@ -693,9 +716,3 @@ body {
 		padding: 1.5rem 1rem;
 	}
 }
-
-/* @media (min-width: 576px) {
-	.leaderboard-row-container {
-		grid-template-columns: 3rem 1fr 8rem;
-	}
-} */
