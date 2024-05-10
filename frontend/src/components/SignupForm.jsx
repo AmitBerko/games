@@ -65,7 +65,7 @@ function SignupForm() {
 							onChange={(e) => {
 								setEmail(e.target.value)
 							}}
-							placeholder=""
+							placeholder=" "
 							id="signup-email"
 							required
 						></input>
@@ -78,7 +78,7 @@ function SignupForm() {
 							onChange={(e) => {
 								setUsername(e.target.value)
 							}}
-							placeholder=""
+							placeholder=" "
 							id="confirm-password"
 							required
 						></input>
@@ -91,7 +91,7 @@ function SignupForm() {
 							onChange={(e) => {
 								setPassword(e.target.value)
 							}}
-							placeholder=""
+							placeholder=" "
 							id="signup-password"
 							required
 						></input>

@@ -43,7 +43,7 @@ function LoginForm() {
 						<input
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							placeholder=""
+							placeholder=" "
 							id="login-email"
 							required
 						></input>
@@ -54,7 +54,7 @@ function LoginForm() {
 						<input
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							placeholder=""
+							placeholder=" "
 							id="login-password"
 							required
 						></input>
