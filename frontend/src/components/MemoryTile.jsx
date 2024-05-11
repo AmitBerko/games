@@ -1,6 +1,6 @@
 import React from 'react'
 
-function MemoryTile({ isCorrect, handleTileClick, id, isDisabled }) {
+function MemoryTile({ handleTileClick, id, isDisabled }) {
 	return (
 		<div
 			className='memory-tile'

@@ -42,7 +42,6 @@ function MemoryGameResults({ showResults, requestHeader, level, handlePlayAgain 
 				<Modal.Footer>
 					<Button
 						variant="primary"
-						// onClick={handlePlayAgain}
 						className="col-12 mx-0 col-sm me-sm-1"
             onClick={handlePlayAgain}
 					>
