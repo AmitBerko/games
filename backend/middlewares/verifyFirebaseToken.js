@@ -6,7 +6,7 @@ dotenv.config()
 admin.initializeApp({
 	credential: admin.credential.cert({
 		type: 'service_account',
-		project_id: 'games-bb191',
+		project_id: process.env.PROJECT_ID,
 		private_key_id: process.env.PRIVATE_KEY_ID,
 		privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
 		client_email: process.env.CLIENT_EMAIL,
