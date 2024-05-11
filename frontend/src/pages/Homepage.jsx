@@ -13,8 +13,13 @@ function Homepage() {
 	return (
 		<div className="homepage">
 			<div className="user-greeting">
-				Hello {userData.username}
-				<button onClick={handleSignOut}>LOG OUT</button>
+				Hello {userData.username},{' '}
+				<i
+					onClick={handleSignOut}
+					style={{ cursor: 'pointer', color: 'lightblue', fontStyle: 'normal' }}
+				>
+					Log out
+				</i>
 			</div>
 			{/* <div className="bubble"></div>
 			<div className="bubble"></div>
