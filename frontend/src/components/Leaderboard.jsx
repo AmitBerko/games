@@ -28,6 +28,7 @@ function Leaderboard() {
 
 	return (
 		<>
+    <BackButton navigateTo="/" />
 			{isLoading ? (
 				<div className="spinner-container">
 					<Spinner className="leaderboard-spinner" />

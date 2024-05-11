@@ -9,12 +9,13 @@
 	box-sizing: border-box;
 	color: var(--text-color);
 	font-family: 'Roboto', sans-serif;
+	touch-action: manipulation;
+  -ms-touch-action: manipulation;
 }
 
 body {
 	background-color: var(--bg-color);
 	margin: 0;
-	touch-action: manipulation;
 }
 
 #check {
@@ -137,9 +138,13 @@ body {
 	border-bottom: rgb(121, 116, 116) 3px solid;
 }
 
+.input-box input::placeholder, .input-box input::-webkit-input-placeholder {
+  overflow: visible;
+}
+
 .input-box input:focus ~ label,
 .input-box input:not(:placeholder-shown) ~ label {
-	transform: translateY(-1.75rem);
+  transform: translateY(-1.75rem);
 	color: rgb(190, 190, 190);
 }
 
@@ -475,6 +480,10 @@ body {
 	margin: 0;
 }
 
+button, .memory-tile {
+  touch-action: none;
+}
+
 .memory-tile {
 	background-color: rgb(150, 150, 150);
 	cursor: pointer;
@@ -533,6 +542,14 @@ body {
   border-top-left-radius: 1.5rem;
   border-bottom-left-radius: 1.5rem;
 } */
+
+.back-button {
+  position: absolute;
+  top: 2.5rem;
+  left: 5vw;
+  font-size: calc(2rem + 1vw);
+  cursor: pointer;
+}
 
 .leaderboard-container {
 	width: 100%;
@@ -598,7 +615,7 @@ body {
 }
 
 .leaderboard-row-container:first-child {
-	background-color: var(--form1-color);
+	background-color: rgb(40, 116, 170);
 	border-bottom: none;
 }
 
@@ -608,7 +625,7 @@ body {
   border: none;
 	border-radius: 0;
 	background-color: inherit;
-	border-left: 1px rgb(173, 216, 230) solid;
+	border-left: 2px rgba(173, 216, 230, 0.5) solid;
 }
 
 .leaderboard-select:focus, .leaderboard-select:active {

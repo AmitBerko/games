@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../components/AuthProvider'
 import axios from '../api/axios'
 import DeobfuscateIndexes from '../misc/Deobfuscator'
+import BackButton from '../components/BackButton'
 
 function MemoryGame() {
 	const [level, setLevel] = useState(1)
@@ -216,6 +217,7 @@ function MemoryGame() {
 
 	return (
 		<>
+    <BackButton navigateTo="/" />
 			<div className="memory-game-container">
 				<div className="level-tries fs-1">
 					<p className="level">Level {level}</p>
