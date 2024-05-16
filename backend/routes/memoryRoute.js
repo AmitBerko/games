@@ -29,19 +29,21 @@ const levelsConfig = {
 	8: { gridLength: 5, correctRatio: 0.45 },
 	9: { gridLength: 5, correctRatio: 0.5 },
 	10: { gridLength: 5, correctRatio: 0.55 },
-	11: { gridLength: 6, correctRatio: 0.35 },
-	12: { gridLength: 6, correctRatio: 0.4 },
-	13: { gridLength: 6, correctRatio: 0.45 },
-	14: { gridLength: 6, correctRatio: 0.5 },
-	15: { gridLength: 6, correctRatio: 0.55 },
-	16: { gridLength: 7, correctRatio: 0.35 },
-	17: { gridLength: 7, correctRatio: 0.4 },
-	18: { gridLength: 7, correctRatio: 0.45 },
-	19: { gridLength: 7, correctRatio: 0.5 },
-	20: { gridLength: 7, correctRatio: 0.55 },
+	11: { gridLength: 5, correctRatio: 0.6 },
+	12: { gridLength: 6, correctRatio: 0.35 },
+	13: { gridLength: 6, correctRatio: 0.4 },
+	14: { gridLength: 6, correctRatio: 0.45 },
+	15: { gridLength: 6, correctRatio: 0.5 },
+	16: { gridLength: 6, correctRatio: 0.55 },
+	17: { gridLength: 6, correctRatio: 0.6 },
+	18: { gridLength: 7, correctRatio: 0.35 },
+	19: { gridLength: 7, correctRatio: 0.4 },
+	20: { gridLength: 7, correctRatio: 0.45 },
+	21: { gridLength: 7, correctRatio: 0.5 },
+	22: { gridLength: 7, correctRatio: 0.55 },
 }
 
-let usersLevel = {} // { 'myjwttoken': {level: 2, correctIndexes: [1,2,3], gridLength: 3, triesLeft: 3} }
+let usersLevel = {}
 
 const getLevelData = (level) => {
 	const maxLevel = Object.keys(levelsConfig).length
@@ -59,16 +61,7 @@ router.get('/startGame', verifyFirebaseToken, (req, res) => {
 		...usersLevel[req.user.token],
 		correctIndexes: ObfuscateIndexes(usersLevel[req.user.token].correctIndexes),
 	})
-})
-
-router.get('/getLevelData', verifyFirebaseToken, (req, res) => {
-	const currentLevel = usersLevel[req.user.token].level
-	let newLevelData = getLevelData(currentLevel)
-	usersLevel[req.user.token] = { ...newLevelData, triesLeft: usersLevel[req.user.token].triesLeft }
-	res.json({
-		...usersLevel[req.user.token],
-		correctIndexes: ObfuscateIndexes(usersLevel[req.user.token].correctIndexes),
-	})
+  console.log(usersLevel[req.user.token])
 })
 
 router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
@@ -99,8 +92,17 @@ router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 		return res.json({ hasPassed: false })
 	}
 
-	usersLevel[req.user.token].level++
-	res.json({ hasPassed: true })
+	const currentLevel = ++usersLevel[req.user.token].level
+  const newLevelData = getLevelData(currentLevel)
+  	usersLevel[req.user.token] = {
+			...newLevelData,
+			triesLeft: usersLevel[req.user.token].triesLeft,
+		}
+	res.json({
+		hasPassed: true,
+		...usersLevel[req.user.token],
+		correctIndexes: ObfuscateIndexes(usersLevel[req.user.token].correctIndexes),
+	})
 })
 
 router.get('/endGame', verifyFirebaseToken, async (req, res) => {

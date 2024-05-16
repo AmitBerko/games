@@ -171,10 +171,8 @@ function MemoryGame() {
 
 				// Get the next level's data
 				time = Date.now()
-				const nextLevelsData = await axios.get('/memory/getLevelData', requestHeader)
-
 				// Update all of the new level's properties
-				const { correctIndexes, gridLength, level, triesLeft } = nextLevelsData.data
+				const { correctIndexes, gridLength, level, triesLeft } = serverVerification.data
 
 				setTriesLeft(triesLeft)
 
