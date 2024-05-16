@@ -5,8 +5,9 @@ import verifyFirebaseToken from '../middlewares/verifyFirebaseToken.js'
 const router = express.Router()
 
 // Get all users
-router.get('/', async (req, res) => {
+router.get('/', verifyFirebaseToken, async (req, res) => {
 	try {
+    // If this will ever be used, just make an if statement to only allow admin users
 		const users = await User.find({})
 		res.status(200).json(users)
 	} catch (error) {
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
 })
 
 // Get one user by uid
-router.get('/:uid', async (req, res) => {
+router.get('/:uid', verifyFirebaseToken, async (req, res) => {
 	const { uid } = req.params
 
 	try {

@@ -18,8 +18,13 @@ export default function AuthProvider({ children }) {
 
 			// Dont fetch again if it's a signup, because we already have the data
 			if (user && !userData && authOperation !== 'signup') {
-				const response = await axios.get(`/users/${user.uid}`)
 				const token = await user.getIdToken()
+				const requestHeaders = {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+				const response = await axios.get(`/users/${user.uid}`, requestHeaders)
 				response.data.token = token
 				setUserData(response.data)
 			}
