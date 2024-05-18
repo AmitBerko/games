@@ -70,7 +70,7 @@ function MemoryGame() {
 		} else if (gridLength === 6) {
 			gridGap = 0.45
 		} else if (gridLength === 7) {
-			gridGap = 0.4
+			gridGap = 0.35
 		}
 		document.documentElement.style.setProperty('--memory-grid-gap', `calc(${gridGap}rem + 0.275vw)`)
 	}, [gridLength])

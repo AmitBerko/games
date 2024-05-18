@@ -455,7 +455,7 @@ body {
 .memory-grid-container {
 	display: grid;
 	place-content: center;
-	width: calc(125px * var(--memory-grid-length));
+	width: calc(calc(2vw + 90px) * var(--memory-grid-length));
 	max-width: min(90vw, 60vh);
 	aspect-ratio: 1;
 	grid-template-columns: repeat(var(--memory-grid-length), 1fr);
@@ -549,6 +549,7 @@ button, .memory-tile {
   left: 5vw;
   font-size: calc(2rem + 1vw);
   cursor: pointer;
+  z-index: 100;
 }
 
 .leaderboard-container {
