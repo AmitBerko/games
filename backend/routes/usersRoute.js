@@ -77,7 +77,7 @@ router.post('/getLeaderboard', async (req, res) => {
 	}
 
   const users = await User.find({}, projection).sort({[leaderboardMode] : -1})
-  res.json(users)
+  res.json(users.slice(0, 5)) // Show only the top 5
 })
 
 export default router
