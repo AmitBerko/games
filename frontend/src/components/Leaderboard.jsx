@@ -18,7 +18,6 @@ function Leaderboard() {
 		const getLeaderboard = async () => {
 			const formattedMode = formatMode()
 			const response = await axios.post('/users/getLeaderboard', { leaderboardMode: formattedMode })
-			console.log(response.data)
 			setleaderboardData(response.data)
 			setIsLoading(false)
 		}

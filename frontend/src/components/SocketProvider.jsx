@@ -10,7 +10,6 @@ function SocketProvider({ children }) {
 
 	useEffect(() => {
 		if (!userData) return
-    console.log(userData)
 		const newSocket = io(import.meta.env.VITE_SERVER_URL, {
 			auth: { token: userData.token }, // Pass the token here
 		})
