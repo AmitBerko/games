@@ -56,18 +56,17 @@ const getLevelData = (level) => {
 
 router.get('/startGame', verifyFirebaseToken, (req, res) => {
 	const levelData = getLevelData(1)
-	usersLevel[req.user.token] = { ...levelData, triesLeft: 3 }
+	usersLevel[req.user.uid] = { ...levelData, triesLeft: 3 }
 	res.json({
-		...usersLevel[req.user.token],
-		correctIndexes: ObfuscateIndexes(usersLevel[req.user.token].correctIndexes),
+		...usersLevel[req.user.uid],
+		correctIndexes: ObfuscateIndexes(usersLevel[req.user.uid].correctIndexes),
 	})
-  console.log(usersLevel[req.user.token])
 })
 
 router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 	const { currentClicked } = req.body
 	let hasPassed = true
-	const levelData = usersLevel[req.user.token]
+	const levelData = usersLevel[req.user.uid]
 
 	// Find out how many mistakes a user has done
 	let mistakes = 0
@@ -85,40 +84,40 @@ router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 		}
 	}
 
-	usersLevel[req.user.token].triesLeft -= mistakes
+	usersLevel[req.user.uid].triesLeft -= mistakes
 	// If a user tries to cheat, delete his current game data
-	if (usersLevel[req.user.token].triesLeft <= 0 || !hasPassed) {
-		delete usersLevel[req.user.token]
+	if (usersLevel[req.user.uid].triesLeft <= 0 || !hasPassed) {
+		delete usersLevel[req.user.uid]
 		return res.json({ hasPassed: false })
 	}
 
-	const currentLevel = ++usersLevel[req.user.token].level
+	const currentLevel = ++usersLevel[req.user.uid].level
   const newLevelData = getLevelData(currentLevel)
-  	usersLevel[req.user.token] = {
+  	usersLevel[req.user.uid] = {
 			...newLevelData,
-			triesLeft: usersLevel[req.user.token].triesLeft,
+			triesLeft: usersLevel[req.user.uid].triesLeft,
 		}
 	res.json({
 		hasPassed: true,
-		...usersLevel[req.user.token],
-		correctIndexes: ObfuscateIndexes(usersLevel[req.user.token].correctIndexes),
+		...usersLevel[req.user.uid],
+		correctIndexes: ObfuscateIndexes(usersLevel[req.user.uid].correctIndexes),
 	})
 })
 
 router.get('/endGame', verifyFirebaseToken, async (req, res) => {
 	// Send data to display in results screen and update the db
-	if (!usersLevel[req.user.token]) {
+	if (!usersLevel[req.user.uid]) {
 		return res.status(500).json({ message: `Start a game before trying to end it` })
 	}
 	try {
 		let usersCurrentBest = (await User.findOne({ uid: req.user.uid })).memoryGameBest
-		const currentLevel = usersLevel[req.user.token].level
+		const currentLevel = usersLevel[req.user.uid].level
 		if (currentLevel > usersCurrentBest) {
 			await User.updateOne({ uid: req.user.uid }, { memoryGameBest: currentLevel })
 			usersCurrentBest = currentLevel
 		}
 
-		delete usersLevel[req.user.token]
+		delete usersLevel[req.user.uid]
 		res.json({ currentLevel, memoryGameBest: usersCurrentBest })
 	} catch (error) {
 		console.error('Error:', error)
