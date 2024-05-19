@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './assets/styles.css'
 import MemoryGame from './pages/MemoryGame'
 import Leaderboard from './components/Leaderboard'
+import SocketProvider from './components/SocketProvider'
 
 const router = createBrowserRouter([
 	{
@@ -26,16 +27,18 @@ const router = createBrowserRouter([
 		path: '/memory-game',
 		element: <ProtectedRoute component={MemoryGame} />,
 	},
-  {
-    path: '/leaderboard',
-    element: <Leaderboard />
-  },
+	{
+		path: '/leaderboard',
+		element: <Leaderboard />,
+	},
 ])
 
 function App() {
 	return (
 		<AuthProvider>
-			<RouterProvider router={router} />
+			<SocketProvider>
+				<RouterProvider router={router} />
+			</SocketProvider>
 		</AuthProvider>
 	)
 }

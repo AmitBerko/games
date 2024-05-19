@@ -2,14 +2,27 @@ import React, { useState, useEffect } from 'react'
 import Tile from '../components/Tile'
 import SpeedGameResults from '../components/SpeedGameResults'
 import { useAuth } from '../components/AuthProvider'
+import io from 'socket.io-client'
+import { useSocket } from '../components/SocketProvider'
 
 function SpeedGame() {
 	const tileCount = 16
 	const gameTime = 15000
-  const [user, setUser] = useAuth()
+	const { userData, setUserData } = useAuth()
+	const socket = useSocket()
+
+	useEffect(() => {
+		if (!socket) return
+		socket.on('connect', () => {
+			console.log('Connected to the server')
+		})
+
+		socket.on('disconnect', () => {
+			console.log('Disconnected from server')
+		})
+	}, [socket])
 
 	const getRandomIndexes = (clickedTile, prevIndexes) => {
-
 		// Generates a random index instead of the one that was click
 		const indexToReplace = prevIndexes.indexOf(clickedTile)
 		const otherIndex = prevIndexes[indexToReplace === 0 ? 1 : 0]
@@ -21,33 +34,32 @@ function SpeedGame() {
 		return [newIndex, otherIndex]
 	}
 
-  const getInitialIndexes = () => {
-    const firstIndex = Math.floor(Math.random() * tileCount)
-    let secondIndex
-    do {
-      secondIndex = Math.floor(Math.random() * tileCount)
-    }
-    while (firstIndex === secondIndex)
+	const getInitialIndexes = () => {
+		const firstIndex = Math.floor(Math.random() * tileCount)
+		let secondIndex
+		do {
+			secondIndex = Math.floor(Math.random() * tileCount)
+		} while (firstIndex === secondIndex)
 
-    return [firstIndex, secondIndex]
-  }
+		return [firstIndex, secondIndex]
+	}
 
 	const [activeIndexes, setActiveIndexes] = useState(getInitialIndexes())
 	const [timer, setTimer] = useState(gameTime) // start with 20 seconds
-	const [readyToStart, setReadyToStart] = useState(false)
+	// const [readyToStart, setReadyToStart] = useState(false)
 	const [hasStarted, setHasStarted] = useState(false)
 	const [score, setScore] = useState(0)
 	const [resultsModalInfo, setResultsModalInfo] = useState({ show: false, score: 0 })
 
 	const handleActiveClick = (e) => {
 		// If it wasn't clicked by a human or game hasn't started, return
-		if (!e.isTrusted || !readyToStart) return
-
-		if (score === 0 && readyToStart) {
+		if (!e.isTrusted) return
+		socket.emit('click', { score: score + 1 })
+		if (score === 0) {
 			setHasStarted(true)
 		}
 		setScore((prevScore) => prevScore + 1)
-    const clickedTile = parseInt(e.target.id.slice(4))
+		const clickedTile = parseInt(e.target.id.slice(4))
 		setActiveIndexes((prevIndexes) => getRandomIndexes(clickedTile, prevIndexes))
 	}
 
@@ -86,8 +98,16 @@ function SpeedGame() {
 					} else {
 						// GAME FINISHED
 						setResultsModalInfo({ show: true, score: score })
-						// setShowResults(true)
-						setReadyToStart(false)
+						socket.emit('endGame', { score })
+
+						if (score > userData.speedGameBest) {
+							setUserData((prevUserData) => {
+								return { ...prevUserData, speedGameBest: score }
+							})
+							console.log(userData)
+							console.log(`updating:: ${score} and best is ${userData.speedGameBest}`)
+							socket.emit('updateScore', { score })
+						}
 						setHasStarted(false)
 						return 0
 					}
@@ -104,17 +124,8 @@ function SpeedGame() {
 		return () => clearInterval(interval)
 	}, [hasStarted, score])
 
-	// useEffect(() => {
-	// 	if (!readyToStart && timer !== 0) {
-	// 		setScore(0)
-	// 		setTimer(gameTime)
-	// 		setHasStarted(false)
-	// 	}
-	// }, [readyToStart])
-
 	return (
 		<>
-    user is {user.name}
 			<div className="speed-game-wrapper">
 				<div className="speed-game-timer-score display-1 fw-medium">
 					<div className="speed-game-timer">{timer}</div>
@@ -130,15 +141,18 @@ function SpeedGame() {
 						/>
 					))}
 				</div>
+				<div className="speed-game-notification fs-2 text-center">
+					{!hasStarted && 'Click any tile to start the game'}
+				</div>
 			</div>
-			<button onClick={() => setReadyToStart(true)}>start</button>
-			<button onClick={() => setReadyToStart(false)}>stop</button>
+			{/* <button onClick={() => setReadyToStart(true)}>start</button>
+			<button onClick={() => setReadyToStart(false)}>stop</button> */}
 			<SpeedGameResults
-				setReadyToStart={setReadyToStart}
+				// setReadyToStart={setReadyToStart}
 				resultsModalInfo={resultsModalInfo}
 				setResultsModalInfo={setResultsModalInfo}
 			/>
-			{`ready: ${readyToStart} hasstarted: ${hasStarted}`}
+			{/* {`ready: ${readyToStart} hasstarted: ${hasStarted}`} */}
 		</>
 	)
 }
