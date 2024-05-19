@@ -145,6 +145,7 @@ function MemoryGame() {
 		const checkIfPassed = async () => {
 			if (hasPassed()) {
 				// Make the level pass animation
+        setDisableTiles(true)
 				const levelPass = document.querySelector('.level-pass')
 				levelPass.classList.add('animate')
 
