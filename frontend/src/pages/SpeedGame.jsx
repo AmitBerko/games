@@ -10,6 +10,12 @@ function SpeedGame() {
 	const gameTime = 15000
 	const { userData, setUserData } = useAuth()
 	const socket = useSocket()
+	const [isNewHighScore, setIsNewHighScore] = useState(false)
+	const [activeIndexes, setActiveIndexes] = useState(getInitialIndexes())
+	const [timer, setTimer] = useState(gameTime)
+	const [hasStarted, setHasStarted] = useState(false)
+	const [score, setScore] = useState(0)
+	const [resultsModalInfo, setResultsModalInfo] = useState({ show: false, score: 0 })
 
 	useEffect(() => {
 		if (!socket) return
@@ -34,7 +40,7 @@ function SpeedGame() {
 		return [newIndex, otherIndex]
 	}
 
-	const getInitialIndexes = () => {
+	function getInitialIndexes() {
 		const firstIndex = Math.floor(Math.random() * tileCount)
 		let secondIndex
 		do {
@@ -44,12 +50,15 @@ function SpeedGame() {
 		return [firstIndex, secondIndex]
 	}
 
-	const [activeIndexes, setActiveIndexes] = useState(getInitialIndexes())
-	const [timer, setTimer] = useState(gameTime) // start with 20 seconds
-	// const [readyToStart, setReadyToStart] = useState(false)
-	const [hasStarted, setHasStarted] = useState(false)
-	const [score, setScore] = useState(0)
-	const [resultsModalInfo, setResultsModalInfo] = useState({ show: false, score: 0 })
+	useEffect(() => {
+		if (isNewHighScore) {
+			setUserData((prevUserData) => {
+				return { ...prevUserData, speedGameBest: score }
+			})
+
+			setIsNewHighScore(false)
+		}
+	}, [isNewHighScore])
 
 	const handleActiveClick = (e) => {
 		// If it wasn't clicked by a human or game hasn't started, return
@@ -101,11 +110,7 @@ function SpeedGame() {
 						socket.emit('endGame', { score })
 
 						if (score > userData.speedGameBest) {
-							setUserData((prevUserData) => {
-								return { ...prevUserData, speedGameBest: score }
-							})
-							console.log(userData)
-							console.log(`updating:: ${score} and best is ${userData.speedGameBest}`)
+							setIsNewHighScore(true)
 							socket.emit('updateScore', { score })
 						}
 						setHasStarted(false)
