@@ -32,10 +32,10 @@ router.get('/:uid', verifyFirebaseToken, async (req, res) => {
 
 // Create a new user
 router.post('/', async (req, res) => {
-	const { uid, username, speedGameBest, memoryGameBest } = req.body
+	const { uid, username } = req.body
 
 	try {
-		const user = await User.create({ uid, username, speedGameBest, memoryGameBest })
+		const user = await User.create({ uid, username, speedGameBest: 0, memoryGameBest: 0 })
 		res.status(201).json(user)
 	} catch (error) {
 		res.status(500).json({ error: `Failed to create new user: ${error}` })
