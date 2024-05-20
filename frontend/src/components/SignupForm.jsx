@@ -11,25 +11,28 @@ function SignupForm() {
 	const [isLoading, setIsLoading] = useState(false)
 	const [errorMessage, setErrorMessage] = useState()
 	const { signup } = useAuth()
-  const navigate = useNavigate()
+	const navigate = useNavigate()
 
 	async function handleRegister(e) {
 		try {
 			e.preventDefault()
 			setIsLoading(true)
-      const regex = /^[a-zA-Z]+$/
-      if (!regex.test(username)) {
-        setErrorMessage('Username must only contain alphabetical letters')
-        return
-      }
+			const regex = /^[a-zA-Z]+$/
+			if (!regex.test(username)) {
+				setErrorMessage('Username must only contain alphabetical letters')
+				return
+			}
 
-      if (username.length <= 4) {
-        setErrorMessage('Username must be atleast 5 letters')
-        return
-      }
+			if (username.length <= 4) {
+				setErrorMessage('Username must be atleast 5 letters')
+				return
+			} else if (username.length >= 11) {
+				setErrorMessage('Username must be a maximum of 10 letters')
+				return
+			}
 
 			const account = await signup(email, username, password)
-      navigate('/')
+			navigate('/')
 			setErrorMessage('')
 			console.log(account)
 		} catch (error) {

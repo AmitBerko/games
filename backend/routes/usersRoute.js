@@ -8,10 +8,10 @@ const router = express.Router()
 router.get('/', verifyFirebaseToken, async (req, res) => {
 	try {
 		// If this will ever be used, just make an if statement to only allow admin users
-    if (true || req.user.uid === 'my uid') {
-      return res.status(400).json({ error: 'Unauthorized' })
-    }
-    
+		if (true || req.user.uid === 'my uid') {
+			return res.status(400).json({ error: 'Unauthorized' })
+		}
+
 		const users = await User.find({})
 		res.status(200).json(users)
 	} catch (error) {
@@ -41,7 +41,12 @@ router.get('/:uid', verifyFirebaseToken, async (req, res) => {
 // Create a new user
 router.post('/', async (req, res) => {
 	const { uid, username } = req.body
-
+	if (username.length <= 4) {
+		res.status(400).json({ error: 'Username must be atleast 5 letters' })
+	} else if (username.length >= 11) {
+		res.status(400).json({ error: 'Username must be a maximum of 10 letters' })
+	}
+  
 	try {
 		const user = await User.create({ uid, username, speedGameBest: 0, memoryGameBest: 0 })
 		res.status(201).json(user)
