@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Tile from '../components/Tile'
 import SpeedGameResults from '../components/SpeedGameResults'
 import { useAuth } from '../components/AuthProvider'
-import io from 'socket.io-client'
+import BackButton from '../components/BackButton'
 import { useSocket } from '../components/SocketProvider'
 
 function SpeedGame() {
@@ -131,6 +131,7 @@ function SpeedGame() {
 
 	return (
 		<>
+			<BackButton navigateTo="/" />
 			<div className="speed-game-wrapper">
 				<div className="speed-game-timer-score display-1 fw-medium">
 					<div className="speed-game-timer">{timer}</div>
