@@ -7,7 +7,11 @@ const router = express.Router()
 // Get all users
 router.get('/', verifyFirebaseToken, async (req, res) => {
 	try {
-    // If this will ever be used, just make an if statement to only allow admin users
+		// If this will ever be used, just make an if statement to only allow admin users
+    if (true || req.user.uid === 'my uid') {
+      return res.status(400).json({ error: 'Unauthorized' })
+    }
+    
 		const users = await User.find({})
 		res.status(200).json(users)
 	} catch (error) {
@@ -18,6 +22,10 @@ router.get('/', verifyFirebaseToken, async (req, res) => {
 // Get one user by uid
 router.get('/:uid', verifyFirebaseToken, async (req, res) => {
 	const { uid } = req.params
+
+	if (req.user.uid !== uid) {
+		return res.status(400).json({ error: 'Unauthorized' })
+	}
 
 	try {
 		const user = await User.findOne({ uid })
@@ -69,15 +77,15 @@ router.put('/:uid', verifyFirebaseToken, async (req, res) => {
 })
 
 router.post('/getLeaderboard', async (req, res) => {
-  const { leaderboardMode } = req.body
-  const projection = {
+	const { leaderboardMode } = req.body
+	const projection = {
 		username: 1,
 		[leaderboardMode]: 1,
 		_id: 0,
 	}
 
-  const users = await User.find({}, projection).sort({[leaderboardMode] : -1})
-  res.json(users.slice(0, 5)) // Show only the top 5
+	const users = await User.find({}, projection).sort({ [leaderboardMode]: -1 })
+	res.json(users.slice(0, 5)) // Show only the top 5
 })
 
 export default router
