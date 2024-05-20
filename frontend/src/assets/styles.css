@@ -614,7 +614,11 @@ button,
 	border: none;
 	border-radius: 0;
 	background-color: inherit;
-	border-left: 2px rgba(173, 216, 230, 0.5) solid;
+	/* border: 2px rgba(173, 216, 230, 0.5) solid; */
+}
+
+.placeholder {
+  cursor: auto;
 }
 
 .leaderboard-select:focus,

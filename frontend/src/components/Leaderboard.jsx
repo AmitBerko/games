@@ -16,6 +16,7 @@ function Leaderboard() {
 	useEffect(() => {
 		// Load the data
 		const getLeaderboard = async () => {
+			setIsLoading(true)
 			const formattedMode = formatMode()
 			const response = await axios.post('/users/getLeaderboard', { leaderboardMode: formattedMode })
 			setleaderboardData(response.data)
@@ -27,33 +28,31 @@ function Leaderboard() {
 
 	return (
 		<>
-    <BackButton navigateTo="/" />
-			{isLoading ? (
-				<div className="spinner-container">
-					<Spinner className="leaderboard-spinner" />
+			<BackButton navigateTo="/" />
+			<Container fluid className="p-0">
+				<div className="leaderboard-container">
+					<LeaderboardRow
+						index="#"
+						name="Name"
+						level="select"
+						setLeaderboardMode={setLeaderboardMode}
+					/>
+					{!isLoading
+						? leaderboardData.map((userData, index) => {
+								return (
+									<LeaderboardRow
+										key={index}
+										index={index + 1}
+										name={userData.username}
+										level={userData[formatMode()]}
+									/>
+								)
+						  })
+						: Array.from({ length: 5 }).map((_, index) => {
+								return <LeaderboardRow key={index} index={index + 1} placeholder={true} />
+						  })}
 				</div>
-			) : (
-				<Container fluid className="p-0">
-					<div className="leaderboard-container">
-						<LeaderboardRow
-							index="#"
-							name="Name"
-							level="select"
-							setLeaderboardMode={setLeaderboardMode}
-						/>
-						{leaderboardData.map((userData, index) => {
-							return (
-								<LeaderboardRow
-									key={index}
-									index={index + 1}
-									name={userData.username}
-									level={userData[formatMode()]}
-								/>
-							)
-						})}
-					</div>
-				</Container>
-			)}
+			</Container>
 		</>
 	)
 }
