@@ -13,6 +13,7 @@ function SpeedGame() {
 	const [isNewHighScore, setIsNewHighScore] = useState(false)
 	const [activeIndexes, setActiveIndexes] = useState(getInitialIndexes())
 	const [timer, setTimer] = useState(gameTime)
+	const [formattedTimer, setFormattedTimer] = useState(formatTimer(gameTime))
 	const [hasStarted, setHasStarted] = useState(false)
 	const [score, setScore] = useState(0)
 	const [resultsModalInfo, setResultsModalInfo] = useState({ show: false, score: 0 })
@@ -60,16 +61,26 @@ function SpeedGame() {
 		}
 	}, [isNewHighScore])
 
-	const handleActiveClick = (e) => {
+	const handleActiveClick = (e, index) => {
 		// If it wasn't clicked by a human or game hasn't started, return
 		if (!e.isTrusted) return
+    
 		socket.emit('click', { score: score + 1 })
 		if (score === 0) {
 			setHasStarted(true)
 		}
 		setScore((prevScore) => prevScore + 1)
-		const clickedTile = parseInt(e.target.id.slice(4))
-		setActiveIndexes((prevIndexes) => getRandomIndexes(clickedTile, prevIndexes))
+		setActiveIndexes((prevIndexes) => getRandomIndexes(index, prevIndexes))
+	}
+
+	function formatTimer(milliseconds) {
+		const totalSeconds = Math.floor(milliseconds / 1000)
+		const remainingMilliseconds = milliseconds % 1000
+
+		const paddedSeconds = String(totalSeconds).padStart(2, '0')
+		const paddedMilliseconds = String(Math.floor(remainingMilliseconds / 10)).padStart(2, '0')
+
+		return `${paddedSeconds}.${paddedMilliseconds}`
 	}
 
 	useEffect(() => {
@@ -101,22 +112,11 @@ function SpeedGame() {
 
 		if (hasStarted) {
 			interval = setInterval(() => {
-				setTimer((prevTimer) => {
-					if (prevTimer > 0) {
-						return prevTimer - 10
-					} else {
-						// GAME FINISHED
-						setResultsModalInfo({ show: true, score: score })
-						socket.emit('endGame', { score })
-
-						if (score > userData.speedGameBest) {
-							setIsNewHighScore(true)
-							socket.emit('updateScore', { score })
-						}
-						setHasStarted(false)
-						return 0
-					}
-				})
+				if (timer > 0) {
+					setTimer((prevTimer) => prevTimer - 10)
+				} else {
+					clearInterval(interval)
+				}
 			}, 10)
 		}
 
@@ -129,20 +129,35 @@ function SpeedGame() {
 		return () => clearInterval(interval)
 	}, [hasStarted, score])
 
+	useEffect(() => {
+		setFormattedTimer(formatTimer(timer))
+
+		if (timer <= 0) {
+      // Game end
+			setResultsModalInfo({ show: true, score: score })
+			socket.emit('endGame', { score })
+
+			if (score > userData.speedGameBest) {
+				setIsNewHighScore(true)
+				socket.emit('updateScore', { score })
+			}
+			setHasStarted(false)
+		}
+	}, [timer])
+
 	return (
 		<>
 			<BackButton navigateTo="/" />
 			<div className="speed-game-wrapper">
 				<div className="speed-game-timer-score display-1 fw-medium">
-					<div className="speed-game-timer">{timer}</div>
+					<div className="speed-game-timer">{formattedTimer}</div>
 					<div className="speed-game-score">{score}</div>
 				</div>
 				<div className="tiles-container">
 					{Array.from({ length: tileCount }).map((_, index) => (
 						<Tile
-							handleActiveClick={handleActiveClick}
+							handleActiveClick={(e) => handleActiveClick(e, index)}
 							key={`tile${index}`}
-							id={`tile${index}`}
 							isActive={activeIndexes.includes(index)}
 						/>
 					))}
