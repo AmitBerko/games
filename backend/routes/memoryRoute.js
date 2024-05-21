@@ -57,7 +57,7 @@ const getLevelData = (level) => {
 router.get('/startGame', verifyFirebaseToken, (req, res) => {
 	const levelData = getLevelData(1)
 	usersLevel[req.user.uid] = { ...levelData, triesLeft: 3 }
-	res.json({
+	res.status(200).json({
 		...usersLevel[req.user.uid],
 		correctIndexes: ObfuscateIndexes(usersLevel[req.user.uid].correctIndexes),
 	})
@@ -65,43 +65,48 @@ router.get('/startGame', verifyFirebaseToken, (req, res) => {
 
 router.post('/checkSolution', verifyFirebaseToken, (req, res) => {
 	const { currentClicked } = req.body
-	let hasPassed = true
-	const levelData = usersLevel[req.user.uid]
 
-	// Find out how many mistakes a user has done
-	let mistakes = 0
-	for (let i = 0; i < currentClicked.length; i++) {
-		if (!levelData.correctIndexes.includes(currentClicked[i])) {
-			mistakes++
+	try {
+		let hasPassed = true
+		const levelData = usersLevel[req.user.uid]
+
+		// Find out how many mistakes a user has done
+		let mistakes = 0
+		for (let i = 0; i < currentClicked.length; i++) {
+			if (!levelData.correctIndexes.includes(currentClicked[i])) {
+				mistakes++
+			}
 		}
-	}
 
-	// Check if user has passed the level
-	for (let i = 0; i < levelData.correctIndexes.length; i++) {
-		if (!currentClicked.includes(levelData.correctIndexes[i])) {
-			hasPassed = false
-			break
+		// Check if user has passed the level
+		for (let i = 0; i < levelData.correctIndexes.length; i++) {
+			if (!currentClicked.includes(levelData.correctIndexes[i])) {
+				hasPassed = false
+				break
+			}
 		}
-	}
 
-	usersLevel[req.user.uid].triesLeft -= mistakes
-	// If a user tries to cheat, delete his current game data
-	if (usersLevel[req.user.uid].triesLeft <= 0 || !hasPassed) {
-		delete usersLevel[req.user.uid]
-		return res.json({ hasPassed: false })
-	}
+		usersLevel[req.user.uid].triesLeft -= mistakes
+		// If a user tries to cheat, delete his current game data
+		if (usersLevel[req.user.uid].triesLeft <= 0 || !hasPassed) {
+			delete usersLevel[req.user.uid]
+			return res.json({ hasPassed: false })
+		}
 
-	const currentLevel = ++usersLevel[req.user.uid].level
-  const newLevelData = getLevelData(currentLevel)
-  	usersLevel[req.user.uid] = {
+		const currentLevel = ++usersLevel[req.user.uid].level
+		const newLevelData = getLevelData(currentLevel)
+		usersLevel[req.user.uid] = {
 			...newLevelData,
 			triesLeft: usersLevel[req.user.uid].triesLeft,
 		}
-	res.json({
-		hasPassed: true,
-		...usersLevel[req.user.uid],
-		correctIndexes: ObfuscateIndexes(usersLevel[req.user.uid].correctIndexes),
-	})
+		res.status(200).json({
+			hasPassed: true,
+			...usersLevel[req.user.uid],
+			correctIndexes: ObfuscateIndexes(usersLevel[req.user.uid].correctIndexes),
+		})
+	} catch (error) {
+    res.status(400).json({error: `Failed to check solution: ${error.message}`})
+  }
 })
 
 router.get('/endGame', verifyFirebaseToken, async (req, res) => {
@@ -118,7 +123,7 @@ router.get('/endGame', verifyFirebaseToken, async (req, res) => {
 		}
 
 		delete usersLevel[req.user.uid]
-		res.json({ currentLevel, memoryGameBest: usersCurrentBest })
+		res.status(200).json({ currentLevel, memoryGameBest: usersCurrentBest })
 	} catch (error) {
 		console.error('Error:', error)
 		res.status(500).json({ message: `Internal server error: ${error}` })

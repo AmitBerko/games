@@ -41,17 +41,21 @@ router.get('/:uid', verifyFirebaseToken, async (req, res) => {
 // Create a new user
 router.post('/', async (req, res) => {
 	const { uid, username } = req.body
-	if (username.length <= 4) {
-		res.status(400).json({ error: 'Username must be atleast 5 letters' })
-	} else if (username.length >= 11) {
-		res.status(400).json({ error: 'Username must be a maximum of 10 letters' })
+
+	if (!uid || !username) {
+		return res.status(400).json({ error: 'uid and username are required fields' })
 	}
-  
+
 	try {
+		if (username.length <= 4) {
+			return res.status(400).json({ error: 'Username must be atleast 5 letters' })
+		} else if (username.length >= 11) {
+			return res.status(400).json({ error: 'Username must be a maximum of 10 letters' })
+		}
 		const user = await User.create({ uid, username, speedGameBest: 0, memoryGameBest: 0 })
-		res.status(201).json(user)
+		return res.status(201).json(user)
 	} catch (error) {
-		res.status(500).json({ error: `Failed to create new user: ${error}` })
+		return res.status(500).json({ error: `Failed to create new user: ${error}` })
 	}
 })
 
@@ -59,12 +63,13 @@ router.post('/', async (req, res) => {
 router.put('/:uid', verifyFirebaseToken, async (req, res) => {
 	const { uid } = req.params
 
-	// Verify if the decoded token's UID matches the UID being updated. throw an error if they differ
-	if (req.user.uid !== uid) {
-		return res.status(400).json({ error: 'Unauthorized' })
-	}
-	const newData = req.body
 	try {
+		// Verify if the decoded token's UID matches the UID being updated. throw an error if they differ
+		if (req.user.uid !== uid) {
+			return res.status(400).json({ error: 'Unauthorized' })
+		}
+		const newData = req.body
+
 		const allowedFields = {
 			speedGameBest: newData.speedGameBest,
 			memoryGameBest: newData.memoryGameBest,
@@ -83,14 +88,18 @@ router.put('/:uid', verifyFirebaseToken, async (req, res) => {
 
 router.post('/getLeaderboard', async (req, res) => {
 	const { leaderboardMode } = req.body
-	const projection = {
-		username: 1,
-		[leaderboardMode]: 1,
-		_id: 0,
-	}
+	try {
+		const projection = {
+			username: 1,
+			[leaderboardMode]: 1,
+			_id: 0,
+		}
 
-	const users = await User.find({}, projection).sort({ [leaderboardMode]: -1 })
-	res.json(users.slice(0, 5)) // Show only the top 5
+		const users = await User.find({}, projection).sort({ [leaderboardMode]: -1 })
+		res.status(200).json(users.slice(0, 5)) // Show only the top 5
+	} catch (error) {
+		res.status(400).json({ error: 'Failed to get leaderboard data' })
+	}
 })
 
 export default router
