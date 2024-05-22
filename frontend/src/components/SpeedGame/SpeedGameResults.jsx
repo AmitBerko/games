@@ -2,8 +2,8 @@ import React, { useEffect } from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { useNavigate } from 'react-router-dom'
-import { useSocket } from './SocketProvider'
-import { useAuth } from './AuthProvider'
+import { useSocket } from '../SocketProvider'
+import { useAuth } from '../Auth/AuthProvider'
 
 function SpeedGameResults({ resultsModalInfo, setResultsModalInfo }) {
 	const socket = useSocket()

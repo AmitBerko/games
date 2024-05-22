@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-import { useAuth } from './AuthProvider'
-import axios from '../api/axios'
+import { useAuth } from '../Auth/AuthProvider'
+import axios from '../../api/axios'
 import { useNavigate } from 'react-router-dom'
 
 function MemoryGameResults({ showResults, requestHeader, level, handlePlayAgain }) {

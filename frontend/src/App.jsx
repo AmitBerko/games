@@ -1,6 +1,6 @@
-import Form from './components/Form'
+import Form from './components/Auth/Form'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import AuthProvider from './components/AuthProvider'
+import AuthProvider from './components/Auth/AuthProvider'
 import Homepage from './pages/Homepage'
 import ProtectedRoute from './components/ProtectedRoute'
 import SpeedGame from './pages/SpeedGame'
