@@ -26,8 +26,8 @@ function SignupForm() {
 			if (username.length <= 4) {
 				setErrorMessage('Username must be atleast 5 letters')
 				return
-			} else if (username.length >= 11) {
-				setErrorMessage('Username must be a maximum of 10 letters')
+			} else if (username.length >= 13) {
+				setErrorMessage('Username must be a maximum of 12 letters')
 				return
 			}
 

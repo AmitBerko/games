@@ -49,8 +49,8 @@ router.post('/', async (req, res) => {
 	try {
 		if (username.length <= 4) {
 			return res.status(400).json({ error: 'Username must be atleast 5 letters' })
-		} else if (username.length >= 11) {
-			return res.status(400).json({ error: 'Username must be a maximum of 10 letters' })
+		} else if (username.length >= 13) {
+			return res.status(400).json({ error: 'Username must be a maximum of 12 letters' })
 		}
 		const user = await User.create({ uid, username, speedGameBest: 0, memoryGameBest: 0 })
 		return res.status(201).json(user)
