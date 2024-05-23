@@ -131,7 +131,6 @@ function SpeedGame() {
 
 	useEffect(() => {
 		setFormattedTimer(formatTimer(timer))
-
 		if (timer <= 0) {
       // Game end
 			setResultsModalInfo({ show: true, score: score })
