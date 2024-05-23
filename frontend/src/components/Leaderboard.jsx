@@ -29,7 +29,7 @@ function Leaderboard() {
 	return (
 		<>
 			<BackButton navigateTo="/" />
-			<div className="d-flex justify-content-center vh-100 align-items-center">
+			<div className="leaderboard-container">
 				<Container className="w-100 d-flex justify-content-center">
 					<Table className="leaderboard m-0">
 						<thead>

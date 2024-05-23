@@ -229,7 +229,8 @@ body {
 	grid-template-rows: 1fr 3.5fr 1fr;
 	grid-column-gap: 0px;
 	grid-row-gap: 0px;
-	height: 100vh;
+	height: 100vh; /* Incase dvh is not supported */
+	height: 100dvh;
 }
 
 .speed-game-timer-score {
@@ -294,7 +295,8 @@ body {
 
 .homepage {
 	width: 100%;
-	height: 100vh;
+	height: 100vh; /* Incase dvh is not supported */
+	height: 100dvh;
 	position: absolute;
 	overflow: hidden;
 	display: flex;
@@ -446,7 +448,8 @@ body {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	height: 100vh;
+	height: 100vh; /* Incase dvh is not supported */
+	height: 100dvh;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
@@ -514,7 +517,8 @@ button,
 	top: 0;
 	left: 0;
 	width: 100vw;
-	height: 100vh;
+	height: 100vh; /* Incase dvh is not supported */
+	height: 100dvh;
 	background: rgb(95, 95, 95);
 	z-index: -1;
 	opacity: 0;
@@ -538,6 +542,14 @@ button,
 	max-width: 850px;
 }
 
+.leaderboard-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh; /* Incase dvh is not supported */
+	height: 100dvh;
+}
+
 .leaderboard .index {
 	width: calc(2rem + 1vw);
 	background-color: #808080;
@@ -551,7 +563,7 @@ button,
 .leaderboard .select {
 	font-weight: 700;
 	background-color: rgb(51, 135, 194);
-  border: none;
+	border: none;
 }
 
 .leaderboard .select > * {
@@ -563,7 +575,7 @@ button,
 }
 
 .leaderboard tbody tr th {
-  padding: 0.75rem 0.5rem;
+	padding: 0.75rem 0.5rem;
 }
 
 .leaderboard tbody tr:last-of-type > th {
@@ -573,13 +585,13 @@ button,
 .leaderboard tbody tr:nth-child(1) .index {
 	color: rgb(163, 134, 44);
 	background-color: rgb(255, 218, 101);
-  border-color: rgb(255, 218, 101);
+	border-color: rgb(255, 218, 101);
 }
 
 .leaderboard tbody tr:nth-child(2) .index {
 	color: rgb(73, 80, 87);
 	background-color: rgb(173, 181, 189);
-  border-color: rgb(173, 181, 189);
+	border-color: rgb(173, 181, 189);
 }
 
 .leaderboard tbody tr:nth-child(3) .index {
@@ -588,22 +600,21 @@ button,
 	border-color: rgb(201, 147, 85);
 }
 
-
 /* Border radius for the leaderboard */
 .leaderboard thead .level {
-  border-top-right-radius: 0.6rem;
+	border-top-right-radius: 0.6rem;
 }
 
 .leaderboard thead .index {
-  border-top-left-radius: 0.6rem;
+	border-top-left-radius: 0.6rem;
 }
 
 .leaderboard tbody tr:last-child .level {
-  border-bottom-right-radius: 0.6rem;
+	border-bottom-right-radius: 0.6rem;
 }
 
 .leaderboard tbody tr:last-child .index {
-  border-bottom-left-radius: 0.6rem;
+	border-bottom-left-radius: 0.6rem;
 }
 
 .placeholder {
