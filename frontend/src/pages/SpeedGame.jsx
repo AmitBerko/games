@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import Tile from '../components/SpeedGame/SpeedTile'
 import SpeedGameResults from '../components/SpeedGame/SpeedGameResults'
 import { useAuth } from '../components/Auth/AuthProvider'
 import BackButton from '../components/BackButton'
 import { useSocket } from '../components/SocketProvider'
+import SpeedTile from '../components/SpeedGame/SpeedTile'
 
 function SpeedGame() {
 	const tileCount = 16
@@ -155,7 +155,7 @@ function SpeedGame() {
 				</div>
 				<div className="tiles-container">
 					{Array.from({ length: tileCount }).map((_, index) => (
-						<Tile
+						<SpeedTile
 							handleActiveClick={(e) => handleActiveClick(e, index)}
 							key={`tile${index}`}
 							isActive={activeIndexes.includes(index)}
