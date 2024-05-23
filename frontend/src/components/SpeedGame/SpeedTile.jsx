@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 function SpeedTile({ id, isActive, handleActiveClick }) {
 	const handleWrongClick = () => {
@@ -15,7 +15,7 @@ function SpeedTile({ id, isActive, handleActiveClick }) {
 
 	return (
 		<div
-			onClick={(e) => handleTileClick(e)}
+			onTouchStart={(e) => handleTileClick(e)}
 			className={`tile ${isActive ? 'active' : ''}`}
 			id={id}
 		></div>
