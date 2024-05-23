@@ -29,30 +29,32 @@ function Leaderboard() {
 	return (
 		<>
 			<BackButton navigateTo="/" />
-			<Container fluid className="p-0">
-				<div className="leaderboard-container">
-					<LeaderboardRow
-						index="#"
-						name="Name"
-						level="select"
-						setLeaderboardMode={setLeaderboardMode}
-					/>
-					{!isLoading
-						? leaderboardData.map((userData, index) => {
-								return (
-									<LeaderboardRow
-										key={index}
-										index={index + 1}
-										name={userData.username}
-										level={userData[formatMode()]}
-									/>
-								)
-						  })
-						: Array.from({ length: 5 }).map((_, index) => {
-								return <LeaderboardRow key={index} index={index + 1} placeholder={true} />
-						  })}
-				</div>
-			</Container>
+			<div className="d-flex justify-content-center vh-100 align-items-center">
+				<Container className="w-100 d-flex justify-content-center">
+					<Table className="leaderboard m-0">
+						<thead>
+							<LeaderboardRow rowType="header" setLeaderboardMode={setLeaderboardMode} />
+						</thead>
+						<tbody>
+							{!isLoading
+								? leaderboardData.map((userData, index) => {
+										return (
+											<LeaderboardRow
+												key={index}
+												index={index + 1}
+												name={userData.username}
+												level={userData[formatMode()]}
+												rowType="normal"
+											/>
+										)
+								  })
+								: Array.from({ length: 5 }).map((_, index) => {
+										return <LeaderboardRow key={index} index={index + 1} rowType="placeholder" />
+								  })}
+						</tbody>
+					</Table>
+				</Container>
+			</div>
 		</>
 	)
 }
