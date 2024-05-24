@@ -637,7 +637,7 @@ button,
 
 @keyframes level-pass {
 	to {
-		opacity: 0.25;
+		opacity: 0.3;
 	}
 }
 
@@ -660,8 +660,8 @@ button,
 	}
 
 	100% {
-		width: 5rem;
-		height: 5rem;
+    width: calc(2.75rem + 2vw);
+		height: calc(2.75rem + 2vw);
 		opacity: 0.2;
 	}
 }
