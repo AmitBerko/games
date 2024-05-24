@@ -19,7 +19,7 @@ function SocketProvider({ children }) {
       console.log('Disconnecting the socket')
 			newSocket.disconnect()
 		}
-	}, [])
+	}, [userData])
 
 	return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
 }
