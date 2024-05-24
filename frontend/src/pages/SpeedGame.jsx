@@ -64,7 +64,7 @@ function SpeedGame() {
 	const handleActiveClick = (e, index) => {
 		// If it wasn't clicked by a human or game hasn't started, return
 		if (!e.isTrusted) return
-    
+
 		socket.emit('click', { score: score + 1 })
 		if (score === 0) {
 			setHasStarted(true)
@@ -107,32 +107,34 @@ function SpeedGame() {
 		}
 	}, [])
 
-	useEffect(() => {
-		let interval
+useEffect(() => {
+	let interval
+	let startTime
 
-		if (hasStarted) {
-			interval = setInterval(() => {
-				if (timer > 0) {
-					setTimer((prevTimer) => prevTimer - 10)
-				} else {
-					clearInterval(interval)
-				}
-			}, 10)
-		}
+	if (hasStarted) {
+		startTime = Date.now()
+		interval = setInterval(() => {
+			const elapsedTime = Date.now() - startTime
+			const remainingTime = gameTime - elapsedTime
+			setTimer(Math.max(remainingTime, 0))
 
-		if (!hasStarted) {
-			setScore(0)
-			setTimer(gameTime)
-		}
+			if (remainingTime <= 0) {
+				clearInterval(interval)
+			}
+		}, 10)
+	} else {
+		setScore(0)
+		setTimer(gameTime)
+	}
 
-		// Cleanup function to clear the interval when the component unmounts or hasStarted changes
-		return () => clearInterval(interval)
-	}, [hasStarted, score])
+	// Cleanup function to clear the interval when the component unmounts or hasStarted changes
+	return () => clearInterval(interval)
+}, [hasStarted])
 
 	useEffect(() => {
 		setFormattedTimer(formatTimer(timer))
 		if (timer <= 0) {
-      // Game end
+			// Game end
 			setResultsModalInfo({ show: true, score: score })
 			socket.emit('endGame', { score })
 
