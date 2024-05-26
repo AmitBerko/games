@@ -8,9 +8,7 @@ import SpeedTile from '../components/SpeedGame/SpeedTile'
 function SpeedGame() {
 	const tileCount = 16
 	const gameTime = 15000
-	const { userData, setUserData } = useAuth()
 	const socket = useSocket()
-	const [isNewHighScore, setIsNewHighScore] = useState(false)
 	const [activeIndexes, setActiveIndexes] = useState(getInitialIndexes())
 	const [timer, setTimer] = useState(gameTime)
 	const [formattedTimer, setFormattedTimer] = useState(formatTimer(gameTime))
@@ -51,15 +49,15 @@ function SpeedGame() {
 		return [firstIndex, secondIndex]
 	}
 
-	useEffect(() => {
-		if (isNewHighScore) {
-			setUserData((prevUserData) => {
-				return { ...prevUserData, speedGameBest: score }
-			})
+	// useEffect(() => {
+	// 	if (isNewHighScore) {
+	// 		setUserData((prevUserData) => {
+	// 			return { ...prevUserData, speedGameBest: score }
+	// 		})
 
-			setIsNewHighScore(false)
-		}
-	}, [isNewHighScore])
+	// 		setIsNewHighScore(false)
+	// 	}
+	// }, [isNewHighScore])
 
 	const handleActiveClick = (e, index) => {
 		// If it wasn't clicked by a human or game hasn't started, return
@@ -136,12 +134,6 @@ useEffect(() => {
 		if (timer <= 0) {
 			// Game end
 			setResultsModalInfo({ show: true, score: score })
-			socket.emit('endGame', { score })
-
-			if (score > userData.speedGameBest) {
-				setIsNewHighScore(true)
-				socket.emit('updateScore', { score })
-			}
 			setHasStarted(false)
 		}
 	}, [timer])

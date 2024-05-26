@@ -7,7 +7,7 @@ import { useAuth } from '../Auth/AuthProvider'
 
 function SpeedGameResults({ resultsModalInfo, setResultsModalInfo }) {
 	const socket = useSocket()
-	const { userData } = useAuth()
+	const { userData, setUserData } = useAuth()
 	const navigate = useNavigate()
 
 	const handlePlayAgain = () => {
@@ -21,7 +21,14 @@ function SpeedGameResults({ resultsModalInfo, setResultsModalInfo }) {
 
 	useEffect(() => {
 		if (resultsModalInfo.show) {
-			// This means the game has ended and the highscore should be updated
+			// This means the game has ended
+			socket.emit('endGame', { score: resultsModalInfo.score, currentBest: userData.speedGameBest })
+
+			if (resultsModalInfo.score > userData.speedGameBest) {
+				setUserData((prevUserData) => {
+					return { ...prevUserData, speedGameBest: resultsModalInfo.score }
+				})
+			}
 		}
 	}, [resultsModalInfo])
 
@@ -37,7 +44,8 @@ function SpeedGameResults({ resultsModalInfo, setResultsModalInfo }) {
 						Your current best is: {/* Doing this to evade delayed results */}
 						{resultsModalInfo.score > userData.speedGameBest
 							? resultsModalInfo.score
-							: userData.speedGameBest} clicks
+							: userData.speedGameBest}{' '}
+						clicks
 					</div>
 				</Modal.Body>
 				<Modal.Footer>
