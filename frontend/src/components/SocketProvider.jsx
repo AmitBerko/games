@@ -7,6 +7,7 @@ const SocketContext = createContext()
 function SocketProvider({ children }) {
 	const [socket, setSocket] = useState(null)
 	const { userData } = useAuth()
+  const token = userData ? userData.token : ''
 
 	useEffect(() => {
 		if (!userData) return
@@ -19,7 +20,7 @@ function SocketProvider({ children }) {
       console.log('Disconnecting the socket')
 			newSocket.disconnect()
 		}
-	}, [userData])
+	}, [token])
 
 	return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
 }
