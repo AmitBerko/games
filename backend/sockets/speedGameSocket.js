@@ -27,6 +27,13 @@ const handleSpeedGameSocket = (io) => {
 			console.log(sessionsData[socket.user.uid], score)
 
       console.log(`the score is ${score} and currentbest is ${currentBest}`)
+      let newScore = sessionsData[socket.user.uid]
+      // This shouldn't happen unless the client is trying to cheat
+      if (sessionsData[socket.user.uid] !== score) {
+        // Just take the minimum out of the two
+        newScore = Math.min(score, sessionsData[socket.user.uid])
+      }
+
 			if (score > currentBest) {
 				console.log('updating best to ', score)
 				await User.findOneAndUpdate(
