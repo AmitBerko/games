@@ -25,9 +25,14 @@ const handleSpeedGameSocket = (io) => {
 			if (!sessionsData[socket.user.uid]) return
       
 			console.log(sessionsData[socket.user.uid], score)
+
+      console.log(`the score is ${score} and currentbest is ${currentBest}`)
 			if (score > currentBest) {
 				console.log('updating best to ', score)
-				await User.findOneAndUpdate({ uid: socket.user.uid }, { speedGameBest: score })
+				await User.findOneAndUpdate(
+					{ uid: socket.user.uid },
+					{ speedGameBest: sessionsData[socket.user.uid] }
+				)
 			}
 			delete sessionsData[socket.user.uid]
 		})
