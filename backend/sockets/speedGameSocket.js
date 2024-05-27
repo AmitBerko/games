@@ -34,11 +34,11 @@ const handleSpeedGameSocket = (io) => {
         newScore = Math.min(score, sessionsData[socket.user.uid])
       }
 
-			if (score > currentBest) {
-				console.log('updating best to ', score)
+			if (newScore > currentBest) {
+				console.log('updating best to ', newScore)
 				await User.findOneAndUpdate(
 					{ uid: socket.user.uid },
-					{ speedGameBest: sessionsData[socket.user.uid] }
+					{ speedGameBest: newScore }
 				)
 			}
 			delete sessionsData[socket.user.uid]
