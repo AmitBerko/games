@@ -54,6 +54,7 @@ function LoginForm() {
 						<input
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
+              type="password"
 							placeholder=" "
 							id="login-password"
 							required

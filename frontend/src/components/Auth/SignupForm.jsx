@@ -95,6 +95,7 @@ function SignupForm() {
 								setPassword(e.target.value)
 							}}
 							placeholder=" "
+              type="password"
 							id="signup-password"
 							required
 						></input>
